@@ -43,7 +43,14 @@ app.get('/logout', function(req, res) {
 
 // The homepage renders differently depending on whether user is logged in.
 app.get('/', function(req, res) {
-    res.redirect('/login');
+    if(Parse.User.current())
+    {
+        res.redirect('/inventory');
+    }
+    else
+    {
+        res.redirect('/login');
+    }
 });
 
 app.get('/inventory', function(req, res) {
