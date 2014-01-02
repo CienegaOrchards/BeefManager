@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Inventory</title>
+  </head>
+  <body>
+    <h1>Welcome!</h1>
+    <table summary="Prices of meats">
+    <tr>
+    <th>Species</th>
+    <th>Category</th>
+    <th>Cut</th>
+    <th>Price</th>
+    </tr>
+    <% for(var i=0; i<prices.length; i++)
+    {
+        var price = prices[i];
+     %>
+    <tr>
+    <td><%= price.get('species') %></td>
+    <td><%= price.get('category') === undefined ? '' : price.get('category') %></td>
+    <td><%= price.get('cut') %></td>
+    <td><%= price.get('price') %></td>
+    </tr>
+    <% } %>
+    </table>
+  </body>
+</html>

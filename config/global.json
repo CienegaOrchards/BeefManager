@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "Beef Inventory Management": {
+            "applicationId": "SR6puc3yY8fVouL0v8W7Zj7s3e3FugJY3Pljd0aG", 
+            "masterKey": "yyl3bbYD6tjHjcYrbfa4zu0F3jy0xcziULfOckSJ"
+        }, 
+        "_default": {
+            "link": "Beef Inventory Management"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.15"
+    }
+}
