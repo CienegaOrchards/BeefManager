@@ -33,23 +33,23 @@ Parse.Cloud.define('moveMeatIDToFreezerID', function(req,res)
                                 success: function(meat)
                                 {
                                     // All OK, return the new meat and freezer objects
-                                    res.json(200, { meat: meat, freezer: freezer });
+                                    res.success({ meat: meat, freezer: freezer });
                                 },
                                 error: function(meat, err)
                                 {
-                                    res.json(500, { error: err, message: "Failed to save meat", meat: meat, freezer: freezer });
+                                    res.error({ error: err, message: "Failed to save meat", meat: meat, freezer: freezer });
                                 }
                             });
                     },
-                    error: function(error)
+                    error: function(err)
                     {
-                        res.json(404, { error: err, message: "Freezer not found", meat: req.params.freezer } );
+                        res.error({ error: err, message: "Freezer not found", meat: req.params.freezer });
                     }
                 });
             },
             error: function(err)
             {
-                res.json(404, { error: err, message: "Meat not found", meat: req.params.meat } );
+                res.error({ error: err, message: "Meat not found", meat: req.params.meat });
             }
         });
     }
@@ -61,19 +61,19 @@ Parse.Cloud.define('moveMeatIDToFreezerID', function(req,res)
 // @param {String} req.param.meat The ID of the meat object to move
 // @param {String} req.param.location The name of the location the new freezer is at
 // @param {String} req.param.freezer The name of the freezer at the new location
-Parse.Cloud.define('moveMeatIDToLocation', function(res, req)
+Parse.Cloud.define('moveMeatIDToLocation', function(req, res)
 {
     if(req.params.meat === undefined)
     {
-        res.json(400, new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'Failed to specify ID for meat'));
+        res.error(new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'Failed to specify ID for meat'));
     }
     else if(req.params.location === undefined)
     {
-        res.json(400, new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'Failed to specify location'));
+        res.error(new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'Failed to specify location'));
     }
     else if(req.params.freezer === undefined)
     {
-        res.json(400, new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'Failed to specify freezer'));
+        res.error(new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'Failed to specify freezer'));
     }
     else
     {
@@ -93,17 +93,17 @@ Parse.Cloud.define('moveMeatIDToLocation', function(res, req)
                                 success: function(meat)
                                 {
                                     // All OK, return the new meat and freezer objects
-                                    res.json(200, { meat: meat, freezer: freezer });
+                                    res.success({ meat: meat, freezer: freezer });
                                 },
                                 error: function(meat, err)
                                 {
-                                    res.json(500, { error: err, message: "Failed to save meat", meat: meat, freezer: freezer });
+                                    res.error({ error: err, message: "Failed to save meat", meat: meat, freezer: freezer });
                                 }
                             });
                         },
-                        error: function(error)
+                        error: function(err)
                         {
-                            if(error.code == Parse.Error.OBJECT_NOT_FOUND)
+                            if(err.code == Parse.Error.OBJECT_NOT_FOUND)
                             {
                                 // Make a freezer
                                 new Freezer().save({ location: req.params.location, identifier: req.params.freezer },
@@ -115,30 +115,30 @@ Parse.Cloud.define('moveMeatIDToLocation', function(res, req)
                                             success: function(meat)
                                             {
                                                 // All OK, return the new meat and freezer objects
-                                                res.json(200, { meat: meat, freezer: freezer });
+                                                res.success({ meat: meat, freezer: freezer });
                                             },
                                             error: function(meat, err)
                                             {
-                                                res.json(500, { error: err, message: "Failed to save meat", meat: meat, freezer: freezer });
+                                                res.error({ error: err, message: "Failed to save meat", meat: meat, freezer: freezer });
                                             }
                                         });
                                     },
                                     error: function(freezer, err)
                                     {
-                                        res.json(500, { error: err, message: "Failed to create freezer/location", meat: meat, location: req.params.location, freezer: req.params.freezer });
+                                        res.error({ error: err, message: "Failed to create freezer/location", meat: meat, location: req.params.location, freezer: req.params.freezer });
                                     }
                                 });
                             }
                             else
                             {
-                                res.json(500, { error: err, message: "Failed while querying for freezer/location", meat: meat, location: req.params.location, freezer: req.params.freezer });
+                                res.error({ error: err, message: "Failed while querying for freezer/location", meat: meat, location: req.params.location, freezer: req.params.freezer });
                             }
                         }
                     });
             },
             error: function(err)
             {
-                res.json(404, { error: err, message: "Meat not found", meat: req.params.meat } );
+                res.error({ error: err, message: "Meat not found", meat: req.params.meat } );
             }
         });
     }
