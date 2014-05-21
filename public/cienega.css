@@ -86,9 +86,20 @@ tr:first-child th:last-child
     border-width:0px 0px 1px 1px;
 }
 
-
 .soldout
 {
     color: #aaa;
     text-decoration: line-through;
+}
+
+/* Locations colorized */
+
+.mtvernon
+{
+    color: #0C0;
+}
+
+.cienegabarn
+{
+    color: #00C;
 }

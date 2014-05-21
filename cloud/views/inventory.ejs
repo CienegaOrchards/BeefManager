@@ -3,20 +3,32 @@
   <head>
     <% include include/jquery-header.ejs %>
     <% include include/cienegacss.ejs %>
+    <% var moment = require('moment'); %>
     <title>Inventory</title>
   </head>
   <body>
+    <% if(user !== undefined && user) { %>
     <button id='logout'>Log Out <%= user.get('realname') %></button></form>
+    <% } %>
     <table summary="Prices of meats">
-        <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Price</th><th>Available</th></tr></thead></thead>
+        <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Qty</th><th>Price</th><th>Location</th><th>Freezer</th><th>Slaughtered</th></tr></thead></thead>
         <tbody>
-            <% var prev_species='', prev_cat = '';
-               prices.forEach(function(price) { %>
-            <tr<% if(price.get('available') == 0) { %> class='soldout'<% } %>>
-            <td><% if(price.get('species') != prev_species) { prev_species = price.get('species') %><%= prev_species %><% } %></td>
-            <td><% if(price.get('category') != prev_cat) { prev_cat = price.get('category') %><%= prev_cat === undefined ? '' : prev_cat %><% } %></td>
-            <td><%= price.get('cut') %></td>
-            <td><span style='float:left;'>$</span> <span class='currency'><%= price.get('price').toFixed(2) %></span></td>
+            <%
+                var prev_species='', prev_cat = '', prev_cut = '';
+                meats.forEach(function(meat) {
+                    var cut = meat.get('cut');
+                    var freezer = meat.get('freezer');
+                    var animal = meat.get('animal');
+            %>
+            <tr>
+            <td><% if(cut.get('species') != prev_species) { prev_species = cut.get('species') %><%= prev_species %><% } %></td>
+            <td><% if(cut.get('category') != prev_cat) { prev_cat = cut.get('category') %><%= prev_cat === undefined ? '' : prev_cat %><% } %></td>
+            <td><% if(cut.get('cut') != prev_cut) { prev_cut = cut.get('cut') %><%= prev_cut === undefined ? '' : prev_cut %><% } %></td>
+            <td><span class='aligndecimals'><%= meat.get('units').toFixed(2) %></span><span style='float:right;'>&nbsp;<%= cut.get('units') %></span></td>
+            <td><span style='float:left;'>$</span> <span class='aligndecimals'><%= (meat.get('units') * cut.get('price')).toFixed(2) %></span></td>
+            <td><span class='location'><%= freezer.get('location') %></span></td>
+            <td><%= freezer.get('identifier') %></td>
+            <td><%= animal === undefined ? '' : moment(animal.get('slaughtered')).fromNow() %></td>
             </tr>
             <% }) %>
         </tbody>
@@ -26,7 +38,8 @@
 
     <script>
         $(document).ready(function() {
-            $('.currency').each(function()
+            // Align decimal points
+            $('.aligndecimals').each(function()
             {
                 var wholePart, fractionPart;
                 var parts = $(this).text().split('.');
@@ -35,13 +48,26 @@
                 var html = '<span style="float:left;text-align:right;width:3em;">' + wholePart + '.</span>';
                 html += '<span style="text-align:left;">' + fractionPart + '</span>';
                 $(this).html(html);
-            })
+            });
+
+            // Colorize locations
+            $('.location').each(function()
+            {
+                if($(this).text() == '91 Mt Vernon')
+                {
+                    $(this).addClass('mtvernon');
+                }
+                else if($(this).text() == 'Cienega Barn')
+                {
+                    $(this).addClass('cienegabarn');
+                }
+            });
 
             $('#logout').button().click(function(event)
             {
                 event.preventDefault();
                 window.location.href = '/logout';
-            })
+            });
         });
     </script>
   </body>
