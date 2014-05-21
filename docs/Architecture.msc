@@ -1,0 +1,41 @@
+msc
+{
+    # Options
+    hscale = "1.5";
+
+
+    # The entities
+    I [label="iOS"],
+    W [label="Web Site"],
+    C [label="Parse Code"],
+    D [label="Parse DB"];
+
+    --- [label="Add meat to freezer"];
+    I rbox I [label="Go to 'Checkin Meat' mode"];
+    I box I [label="Scan freezer label"];
+    I box I [label="Scan meat label"];
+    I => C [label="move(meat,freezer)"];
+    C => D [label="meat.freezer = freezer"];
+    I rbox I [label="No more meat, ie done"];
+    I -> C [label="done"];
+    C abox C [label="Check order(s) completed; send notification(s)"];
+
+    |||;
+    |||;
+
+    --- [label="Remove meat from freezer"];
+    I rbox I [label="Go to 'Checkout Meat' mode"];
+    I box I [label="Scan meat label"];
+    I => C [label="remove(meat)"];
+    C => D [label="meat.freezer=nil"];
+
+    |||;
+    |||;
+
+    --- [label="Deliver order to customer"];
+    I rbox I  [label="Go to 'Deliver' mode"];
+    I box I [label="Scan order label"];
+    I => C [label="delivered(order)"];
+    C => D [label="orders.delivered=true"];
+    C => D [label="orders.meats.freezer=nil"];
+}
