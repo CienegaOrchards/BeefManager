@@ -143,3 +143,7 @@ Parse.Cloud.define('moveMeatIDToLocation', function(req, res)
         });
     }
 });
+
+module.exports = exports = function(app)
+{
+};

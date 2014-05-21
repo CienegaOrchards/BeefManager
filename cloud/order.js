@@ -4,3 +4,8 @@ var Animal = Parse.Object.extend('Animal');
 var Freezer = Parse.Object.extend('Freezer');
 var Order = Parse.Object.extend('Order');
 var OrderItem = Parse.Object.extend('OrderItem');
+
+module.exports = exports = function(app)
+{
+
+}

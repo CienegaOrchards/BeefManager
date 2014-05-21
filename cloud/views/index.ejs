@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Cienega Orchards Store</title>
+    </head>
+    <body>
+    <ul>
+        <li><a href="/inventory">Inventory</a></li>
+        <% if(Parse.User.current()) { %>
+        <li><a href="/prices">Prices</a></li>
+        <li><a href="/logout">Logout</a></li>
+        <% } else { %>
+        <li><a href="/login">Login</a></li>
+        <% }%>
+    </ul>
+    </body>
+</html>
