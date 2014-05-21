@@ -1,29 +1,49 @@
-
 <!DOCTYPE html>
 <html>
   <head>
+    <% include include/jquery-header.ejs %>
+    <% include include/cienegacss.ejs %>
     <title>Inventory</title>
   </head>
   <body>
-    <h1>Welcome!</h1>
+    <button id='logout'>Log Out <%= user.get('realname') %></button></form>
     <table summary="Prices of meats">
-    <tr>
-    <th>Species</th>
-    <th>Category</th>
-    <th>Cut</th>
-    <th>Price</th>
-    </tr>
-    <% for(var i=0; i<prices.length; i++)
-    {
-        var price = prices[i];
-     %>
-    <tr>
-    <td><%= price.get('species') %></td>
-    <td><%= price.get('category') === undefined ? '' : price.get('category') %></td>
-    <td><%= price.get('cut') %></td>
-    <td><%= price.get('price') %></td>
-    </tr>
-    <% } %>
+        <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Price</th><th>Available</th></tr></thead></thead>
+        <tbody>
+            <% var prev_species='', prev_cat = '';
+               prices.forEach(function(price) { %>
+            <tr<% if(price.get('available') == 0) { %> class='soldout'<% } %>>
+            <td><% if(price.get('species') != prev_species) { prev_species = price.get('species') %><%= prev_species %><% } %></td>
+            <td><% if(price.get('category') != prev_cat) { prev_cat = price.get('category') %><%= prev_cat === undefined ? '' : prev_cat %><% } %></td>
+            <td><%= price.get('cut') %></td>
+            <td><span style='float:left;'>$</span> <span class='currency'><%= price.get('price').toFixed(2) %></span></td>
+            <td><%= price.get('available') === undefined ? '' : price.get('available') %></td>
+            </tr>
+            <% }) %>
+        </tbody>
     </table>
+
+    <% include include/jquery-scripts.ejs %>
+
+    <script>
+        $(document).ready(function() {
+            $('.currency').each(function()
+            {
+                var wholePart, fractionPart;
+                var parts = $(this).text().split('.');
+                wholePart = parts.shift();
+                fractionPart = parts.shift();
+                var html = '<span style="float:left;text-align:right;width:3em;">' + wholePart + '.</span>';
+                html += '<span style="text-align:left;">' + fractionPart + '</span>';
+                $(this).html(html);
+            })
+
+            $('#logout').button().click(function(event)
+            {
+                event.preventDefault();
+                window.location.href = '/logout';
+            })
+        });
+    </script>
   </body>
 </html>

@@ -1,0 +1,94 @@
+@import url(http://fonts.googleapis.com/css?family=Noto+Sans);
+
+body
+{
+    font-family: "Noto Sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight:300;
+    padding: 30px;
+}
+
+select
+{
+    font-family: "Noto Sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight:300;
+    font-size: 120%;
+    float: right;
+}
+
+input
+{
+    font-family: "Noto Sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight:300;
+    font-size: 100%;
+    float: right;
+}
+
+table
+{
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin:0px;padding:0px;
+}
+
+tr:hover td
+{
+    background-color: #ccc;
+}
+
+tr:nth-child(odd)
+{
+    background-color:#eee;
+}
+
+td
+{
+    vertical-align:middle;
+    border:1px solid #000000;
+    border-width:0px 1px 1px 0px;
+    text-align:left;
+    padding:7px;
+    font-weight:normal;
+}
+
+tr:last-child td
+{
+    border-width:0px 1px 0px 0px;
+}
+
+tr td:last-child
+{
+    border-width:0px 0px 1px 0px;
+}
+
+tr:last-child td:last-child
+{
+    border-width:0px 0px 0px 0px;
+}
+
+th
+{
+    background-color:#ccc;
+    border:0px solid #000000;
+    text-align:center;
+    border-width:0px 0px 1px 1px;
+    font-size:120%;
+    font-weight:bold;
+    padding: 10px;
+}
+
+tr:first-child th:first-child
+{
+    border-width:0px 0px 1px 0px;
+}
+
+tr:first-child th:last-child
+{
+    border-width:0px 0px 1px 1px;
+}
+
+
+.soldout
+{
+    color: #aaa;
+    text-decoration: line-through;
+}
