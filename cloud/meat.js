@@ -5,10 +5,10 @@ var Freezer = Parse.Object.extend('Freezer');
 var Order = Parse.Object.extend('Order');
 var OrderItem = Parse.Object.extend('OrderItem');
 
-// Function: moveMeatToFreezer
+// Function: moveMeatIDToFreezerID
 // @param {String} req.param.meat The ID of the meat object to move
 // @param {String} req.param.freezer The ID of the freezer object to move the meat into
-Parse.Cloud.define('moveMeatToFreezer', function(req,res)
+Parse.Cloud.define('moveMeatIDToFreezerID', function(req,res)
 {
     if(req.params.meat === undefined)
     {
@@ -55,13 +55,13 @@ Parse.Cloud.define('moveMeatToFreezer', function(req,res)
     }
 });
 
-// Function: moveMeatToLocation
+// Function: moveMeatIDToLocation
 // Move the meat to the named location and freezer; create a new freezer if it didn't already exist
 //
 // @param {String} req.param.meat The ID of the meat object to move
 // @param {String} req.param.location The name of the location the new freezer is at
 // @param {String} req.param.freezer The name of the freezer at the new location
-Parse.Cloud.define('moveMeatToLocation', function(res, req)
+Parse.Cloud.define('moveMeatIDToLocation', function(res, req)
 {
     if(req.params.meat === undefined)
     {
