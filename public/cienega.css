@@ -103,3 +103,8 @@ tr:first-child th:last-child
 {
     color: #00C;
 }
+
+.menuItem
+{
+    padding: 0.5em;
+}
