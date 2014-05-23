@@ -1,3 +1,25 @@
+// Function: navItems
+// Returns a list of {title,link} to build a nav menu
+Parse.Cloud.define('navItems', function(req,res)
+{
+    var menu = [
+        {title: 'Inventory', link: '/inventory'},
+    ];
+
+    if(req.params.user !== undefined && req.params.user)
+    {
+        menu.push({title: 'Prices', link: '/prices'});
+        menu.push({title: 'Logout', link: '/logout'});
+    }
+    else
+    {
+        menu.push({title: 'Login', link: '/login'});
+    }
+
+    res.success(menu);
+});
+
+
 
 // These two lines are required to initialize Express in Cloud Code.
 var express = require('express');
@@ -24,3 +46,4 @@ app.use(function(err, req, res, next){
 });
 
 module.exports = exports = app;
+
