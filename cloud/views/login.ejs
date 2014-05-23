@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <% include include/jquery-header.ejs %>
+        <% include include/cienegacss.ejs %>
         <title>Login Page</title>
     </head>
     <body>
         <form method="post" action="/login">
-            <label>Username</label>
-            <input name="username" />
-            <label>Password</label>
-            <input name="password" type="password" />
+            <label>Username</label><input name="username" /><br />
+            <label>Password</label><input name="password" type="password" /><br />
             <input class="button" type="submit" value="Log In" />
         </form>
     </body>
