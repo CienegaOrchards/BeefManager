@@ -9,7 +9,7 @@ add_subdirectory(docs)
 add_custom_target( ParseDeploy ALL
     COMMAND parse deploy
     WORKING_DIRECTORY ${SRC_PATH}
-    COMMENT Deploying to Parse cloud...
+    COMMENT "Deploying to Parse cloud"
     )
 
 FILE(GLOB_RECURSE CLOUD_FILES
