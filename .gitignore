@@ -22,3 +22,15 @@ Temporary Items
 
 # Sublime workspaces
 *.sublime-workspace
+
+# CMake turds
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# Ninja stuff
+.ninja_*
+build.ninja
+rules.ninja
