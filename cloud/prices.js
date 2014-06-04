@@ -9,7 +9,7 @@ module.exports = exports = function(app)
     app.get('/prices', function(req, res) {
         // Display the user profile if user is logged in.
         if (Parse.User.current()) {
-            var query = new Parse.Query('Prices')
+            (new Parse.Query('Prices'))
                 .ascending('-species,category,cut')
 
             .find({
