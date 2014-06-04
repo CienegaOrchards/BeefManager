@@ -26,8 +26,8 @@
             <td><% if(cut.get('cut') != prev_cut) { prev_cut = cut.get('cut') %><%= prev_cut === undefined ? '' : prev_cut %><% } %></td>
             <td><span class='aligndecimals'><%= meat.get('units').toFixed(2) %></span><span style='float:right;'>&nbsp;<%= cut.get('units') %></span></td>
             <td><span style='float:left;'>$</span> <span class='aligndecimals'><%= (meat.get('units') * cut.get('price')).toFixed(2) %></span></td>
-            <td><span class='location'><%= freezer.get('location') %></span></td>
-            <td><%= freezer.get('identifier') %></td>
+            <td><span class='location'><%= freezer === undefined ? meat.get('location') : freezer.get('location') %></span></td>
+            <td><%= freezer === undefined ? '' : freezer.get('identifier') %></td>
             <td><%= animal === undefined ? '' : moment(animal.get('slaughtered')).fromNow() %></td>
             </tr>
             <% }) %>
