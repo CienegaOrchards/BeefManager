@@ -3,5 +3,51 @@
 $(function()
 {
     Parse.initialize("SR6puc3yY8fVouL0v8W7Zj7s3e3FugJY3Pljd0aG", "mVao9K1CO4RYrsfCE9GPOMROVJjDPZqtNvxnYOD1");
+
+    // Populate the menu
+    Parse.Cloud.run('navItems', { user: <%- JSON.stringify(user) %> },{
+        success: function(items)
+        {
+            $('#menu').empty();
+            items.forEach(function(item)
+            {
+                $('<span></span>').addClass('menuItem').html($('<a>',
+                {
+                    text: item.title,
+                    href: item.link
+                })).appendTo('#menu');
+            });
+        },
+        error: function(err)
+        {
+            $('#menu').html("Error: "+JSON.stringify(err));
+        }
+    });
+
+    // Align decimal points
+    $('.aligndecimals').each(function()
+    {
+        var wholePart, fractionPart;
+        var parts = $(this).text().split('.');
+        wholePart = parts.shift();
+        fractionPart = parts.shift();
+        var html = '<span style="float:left;text-align:right;width:3em;">' + wholePart + '.</span>';
+        html += '<span style="text-align:left;">' + fractionPart + '</span>';
+        $(this).html(html);
+    });
+
+    // Colorize locations
+    $('.location').each(function()
+    {
+        if($(this).text() == '91 Mt Vernon')
+        {
+            $(this).addClass('mtvernon');
+        }
+        else if($(this).text() == 'Cienega Barn')
+        {
+            $(this).addClass('cienegabarn');
+        }
+    });
+
 });
 </script>

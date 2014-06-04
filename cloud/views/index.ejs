@@ -6,32 +6,10 @@
         <title>Cienega Orchards Store</title>
     </head>
     <body>
-    <div id='menu'></div>
-    <div id='content'></div>
-    <% include include/jquery-scripts.ejs %>
-    <% include include/parse-scripts.ejs %>
-    <script>
-    $(function()
-    {
-        Parse.Cloud.run('navItems',{ user: Parse.User.current() },{
-            success: function(items)
-            {
-                $('#menu').empty();
-                items.forEach(function(item)
-                {
-                    $('<span></span>').addClass('menuItem').html($('<a>',
-                    {
-                        text: item.title,
-                        href: item.link
-                    })).appendTo('#menu');
-                });
-            },
-            error: function(err)
-            {
-                $('#menu').html("Error: "+JSON.stringify(err));
-            }
-        });
-    });
-    </script>
+        <div id='menu'></div>
+        <div id='content'></div>
+
+        <% include include/jquery-scripts.ejs %>
+        <% include include/parse-scripts.ejs %>
     </body>
 </html>
