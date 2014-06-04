@@ -11,6 +11,7 @@ module.exports = exports = function(app)
     app.get('/inventory', function(req, res) {
         // If user exists, fetch their info for display
         if(Parse.User.current()) { Parse.User.current().fetch(); }
+        else { req.session.postLoginPage = '/inventory'; }
 
         // Query for Meat that is in the price list
         var meatQuery = new Parse.Query('Meat')
