@@ -9,7 +9,7 @@ Parse.Cloud.define('navItems', function(req,res)
     if(req.params.user !== undefined && req.params.user)
     {
         menu.push({title: 'Prices', link: '/prices'});
-        menu.push({title: 'Logout', link: '/logout'});
+        menu.push({title: 'Logout ('+req.params.user.realname+')', link: '/logout'});
     }
     else
     {
