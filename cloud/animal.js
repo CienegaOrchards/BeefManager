@@ -6,4 +6,4 @@ var Freezer = Parse.Object.extend('Freezer');
 module.exports = exports = function(app)
 {
 
-}
+};
