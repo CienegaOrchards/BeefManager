@@ -20,31 +20,40 @@
             "name": "BeefManager - all",
             "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "all"],
             "working_dir": "${project_path}",
-            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
         },
         {
             "name": "BeefManager - clean",
             "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "clean"],
             "working_dir": "${project_path}",
-            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+
         },
         {
             "name": "BeefManager - ParseDeploy",
             "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "ParseDeploy"],
             "working_dir": "${project_path}",
-            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+
         },
         {
             "name": "BeefManager - rebuild_cache",
             "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "rebuild_cache"],
             "working_dir": "${project_path}",
-            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+
         },
         {
             "name": "BeefManager - MscgenDocs",
             "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "MscgenDocs"],
             "working_dir": "${project_path}",
-            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+
         }
     ]
     }
