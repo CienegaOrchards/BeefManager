@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
     <% include include/cienegacss.ejs %>
     <title>Price List</title>
-  </head>
-  <body>
+</head>
+<body>
     <div id='menu'></div>
 
     <div id='content'>
@@ -14,20 +14,20 @@
             <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Price</th></tr></thead></thead>
             <tbody>
                 <% var prev_species='', prev_cat = '';
-                   prices.forEach(function(price) { %>
+                prices.forEach(function(price) { %>
                 <tr<% if(price.get('available') == 0) { %> class='soldout'<% } %>>
                 <td><% if(price.get('species') != prev_species) { prev_species = price.get('species') %><%= prev_species %><% } %></td>
                 <td><% if(price.get('category') != prev_cat) { prev_cat = price.get('category') %><%= prev_cat === undefined ? '' : prev_cat %><% } %></td>
                 <td><%= price.get('cut') %></td>
                 <td><span style='float:left;'>$</span> <span class='aligndecimals'><%= price.get('price').toFixed(2) %></span></td>
-                </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    </div>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
 
-    <% include include/jquery-scripts.ejs %>
-    <% include include/parse-scripts.ejs %>
+<% include include/jquery-scripts.ejs %>
+<% include include/parse-scripts.ejs %>
 
-  </body>
+</body>
 </html>
