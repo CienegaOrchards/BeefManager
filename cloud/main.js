@@ -19,6 +19,6 @@ require('cloud/meat.js')(app);
 // Functions related to Orders
 require('cloud/order.js')(app);
 
-app.get('/', function(req, res) { res.render('index'); });
+app.get('/', function(req, res) { res.render('index', { user: Parse.User.current() }); });
 
 app.listen();
