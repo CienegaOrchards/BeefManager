@@ -7,10 +7,40 @@
     <title>Login Page</title>
 </head>
 <body>
-    <form method="post" action="/login">
-        <label>Username</label><input name="username" /><br />
-        <label>Password</label><input name="password" type="password" /><br />
-        <input class="button" type="submit" value="Log In" />
+    <form class="loginForm" method="post" action="/login">
+        <div><label for="username">Username</label><input name="username" /></div>
+        <div><label for="password">Password</label><input name="password" type="password" /></div>
+        <div><input class="button" type="submit" value="Log In" /></div>
     </form>
+
+    <% include include/jquery-scripts.ejs %>
+    <script>
+    jQuery.fn.autoWidth = function(options)
+    {
+      var settings = {
+            limitWidth   : false
+      }
+
+      if(options) {
+            jQuery.extend(settings, options);
+        };
+
+        var maxWidth = 0;
+
+      this.each(function(){
+            if ($(this).width() > maxWidth){
+              if(settings.limitWidth && maxWidth >= settings.limitWidth) {
+                maxWidth = settings.limitWidth;
+              } else {
+                maxWidth = $(this).width();
+              }
+            }
+      });
+
+      this.width(maxWidth);
+    }
+
+    $("form div label").autoWidth();
+    </script>
 </body>
 </html>
