@@ -10,6 +10,21 @@ msc
     C [label="Parse Code"],
     D [label="Parse DB"];
 
+    --- [label="Receive Meat From Butcher"];
+    W rbox W [label="Go to 'Receive Meat' mode"];
+    W box W [label="Enter batch info"];
+    W => C [label="Create animal"];
+    C => D [label="Create animal"];
+    W box W [label="Enter type and weight of each cut"];
+    W => C [label="Create Meat"];
+    C => D [label="Create Meat"];
+    C => D [label="Create Cut/Price if necessary"];
+    W box W [label="No more meat, ie done"];
+    W -> C [label="done"];
+    C -> W [label="unprinted labels"];
+    W box W [label="Print labels"];
+    W rbox W [label="Attach labels then Add Meat To Freezer"];
+
     --- [label="Add meat to freezer"];
     I rbox I [label="Go to 'Checkin Meat' mode"];
     I box I [label="Scan freezer label"];
