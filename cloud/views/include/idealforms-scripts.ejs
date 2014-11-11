@@ -1,0 +1,16 @@
+<script src="/idealforms/js/out/jquery.idealforms.min.js"></script>
+<script>
+$('form').idealforms({
+    onSubmit: function(invalid, e)
+    {
+        if(invalid)
+        {
+            e.preventDefault();
+            $('#invalid')
+                .show()
+                .toggleClass('valid', ! invalid)
+                .text(invalid ? (invalid +' invalid fields') : 'All good!');
+        }
+    }
+});
+</script>

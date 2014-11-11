@@ -7,16 +7,9 @@ body
     padding: 30px;
 }
 
-form label, form input
+form.idealforms label.main
 {
-    display: inline-block;
-}
-
-input
-{
-    font-family: "Noto Sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-weight:300;
-    font-size: 100%;
+    margin-top: 0;
 }
 
 table
