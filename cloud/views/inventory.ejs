@@ -3,6 +3,7 @@
 <head>
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
+    <% include include/alertify-header.ejs %>
     <% include include/cienegacss.ejs %>
     <% var moment = require('moment'); %>
     <title>Inventory</title>
@@ -12,7 +13,7 @@
 
     <div id='content'>
         <table summary="Prices of meats">
-            <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Qty</th><th>Price</th><th>Location</th><th>Freezer</th><th>Slaughtered</th></tr></thead></thead>
+            <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Qty</th><th>Price</th><th>Location</th><th>Freezer</th><th>Slaughtered</th><th>Barcode</th></tr></thead></thead>
             <tbody>
                 <%
                 var prev_species='', prev_cat = '', prev_cut = '';
@@ -30,6 +31,7 @@
                         <td><span class='location'><%= freezer === undefined ? meat.get('location') : freezer.get('location') %></span></td>
                         <td><%= freezer === undefined ? '' : freezer.get('identifier') %></td>
                         <td><%= animal === undefined ? '' : moment(animal.get('slaughtered')).fromNow() %></td>
+                        <td><a href='#' class='button qrcode' meatdesc='<%= meat.get('units')+cut.get('units')+" "+prev_species+" "+prev_cut %>' meatid='<%= meat.id %>'>Show</a></td>
                     </tr>
                 <% }) %>
             </tbody>
@@ -38,6 +40,36 @@
 
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
+    <% include include/qrcode-scripts.ejs %>
+    <% include include/alertify-scripts.ejs %>
+
+    <script>
+    $(function(){
+        $(".qrcode").click(function(e)
+        {
+            var qrcode = document.createElement('div');
+            $(qrcode).qrcode({
+                size: 300,
+
+                ecLevel: 'H',
+
+                fill: '#000',
+                background: '#fff',
+                text: '{"desc"="'+$(this).attr('meatdesc')+'","id"="'+$(this).attr('meatid')+'"}',
+
+                mode: 2,
+                mSize: 0.08,
+                mPosY: 0.85,
+                fontname: 'Accidental Presidency',
+                fontcolor: '#f00',
+
+                label: $(this).attr('meatdesc')
+            });
+
+            alertify.alert($(this).attr('meatdesc'), qrcode);
+        });
+    });
+    </script>
 
 </body>
 </html>
