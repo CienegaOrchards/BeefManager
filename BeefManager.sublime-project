@@ -18,41 +18,41 @@
     [
         {
             "name": "BeefManager - all",
-            "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "all"],
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "all"],
             "working_dir": "${project_path}",
             "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
-            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
         },
         {
             "name": "BeefManager - clean",
-            "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "clean"],
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "clean"],
             "working_dir": "${project_path}",
             "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
-            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
         },
         {
             "name": "BeefManager - ParseDeploy",
-            "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "ParseDeploy"],
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "ParseDeploy"],
             "working_dir": "${project_path}",
             "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
-            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
         },
         {
             "name": "BeefManager - rebuild_cache",
-            "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "rebuild_cache"],
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "rebuild_cache"],
             "working_dir": "${project_path}",
             "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
-            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
         },
         {
             "name": "BeefManager - MscgenDocs",
-            "cmd": ["/opt/local/bin/ninja", "-f", "build.ninja", "-v", "MscgenDocs"],
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "MscgenDocs"],
             "working_dir": "${project_path}",
             "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
-            "path": "~/bin:/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
         }
     ]
