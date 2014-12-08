@@ -28,16 +28,33 @@ module.exports = exports = function(app)
             // Use | as separator because at least in ASCII it's alphabetically later than all letters
             return cut.get('species')+'|'+cut.get('category')+'|'+cut.get('cut');
         };
-        meats.fetch({
-            success: function(meats)
+
+        var freezerQuery = new Parse.Query('Freezer');
+        var freezers = freezerQuery.collection();
+        freezers.comparator = function(object)
+        {
+            return object.get('location')+'|'+object.get('identifier');
+        }
+        freezers.fetch({
+            success: function(freezers)
             {
-                res.render('inventory', { user: Parse.User.current(), meats: meats });
+                meats.fetch({
+                    success: function(meats)
+                    {
+                        res.render('inventory', { user: Parse.User.current(), meats: meats, freezers: freezers });
+                    },
+                    error: function(err)
+                    {
+                        res.json(500, err);
+                    }
+                });
             },
             error: function(err)
             {
                 res.json(500, err);
             }
         });
+
     });
 
 };

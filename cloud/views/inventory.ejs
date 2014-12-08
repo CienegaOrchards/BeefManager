@@ -28,12 +28,30 @@
                         <td><% if(cut.get('cut') != prev_cut) { prev_cut = cut.get('cut') %><%= prev_cut === undefined ? '' : prev_cut %><% } %></td>
                         <td><span class='aligndecimals'><%= meat.get('units').toFixed(2) %></span><span style='float:right;'>&nbsp;<%= cut.get('units') %></span></td>
                         <td><span style='float:left;'>$</span> <span class='aligndecimals'><%= (meat.get('units') * cut.get('price')).toFixed(2) %></span></td>
-                        <td><span class='location'><%= freezer === undefined ? meat.get('location') : freezer.get('location') %></span></td>
-                        <td><%= freezer === undefined ? '' : freezer.get('identifier') %></td>
-                        <td><%= animal === undefined ? '' : moment(animal.get('slaughtered')).fromNow() %></td>
-                        <td><a href='#' class='button qrcode' meatdesc='<%= meat.get('units')+cut.get('units')+" "+prev_species+" "+prev_cut %>' meatid='<%= meat.id %>'>Show</a></td>
+                        <td><span class='location'><%= freezer === undefined || freezer === null ? meat.get('location') : freezer.get('location') %></span></td>
+                        <td><%= freezer === undefined || freezer === null ? '' : freezer.get('identifier') %></td>
+                        <td><%= animal === undefined || animal === null ? '' : moment(animal.get('slaughtered')).fromNow() %></td>
+                        <td><a href='#' class='button qrcode' desc='<%= meat.get('units')+cut.get('units')+" "+prev_species+" "+prev_cut %>' ident='<%= meat.id %>'>Show</a></td>
                     </tr>
                 <% }) %>
+            </tbody>
+        </table>
+        <br /><br /><hr /><br /><br />
+        <table summary="List of freezers">
+            <thead>
+                <tr><th>Location</th><th>Freezer</th><th>Barcode</th></tr>
+            </thead>
+            <tbody>
+                <%
+                freezers.forEach(function(freezer) {
+                %>
+                    <tr>
+                        <td><span class='location'><%= freezer.get('location') %></span></td>
+                        <td><%= freezer.get('identifier') %></td>
+                        <td><a href='#' class='button qrcode' desc='<%= freezer.get('location')+' - '+freezer.get('identifier') %>' ident='<%= freezer.id %>'>Show</a></td>
+
+                    </tr>
+                <% }); %>
             </tbody>
         </table>
     </div>
@@ -43,30 +61,59 @@
     <% include include/qrcode-scripts.ejs %>
     <% include include/alertify-scripts.ejs %>
 
+    <script type="text/javascript">
+    WebFontConfig = {
+        google: { families: [ 'Amatic+SC:700:latin' ] }
+    };
+    (function() {
+        var wf = document.createElement('script');
+        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+    })();
+    </script>
     <script>
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    var tempCanvas = document.createElement('canvas');
+    var context = tempCanvas.getContext('2d');
+    var backingStoreRatio = context.webkitBackingStorePixelRatio ||
+                        context.mozBackingStorePixelRatio ||
+                        context.msBackingStorePixelRatio ||
+                        context.oBackingStorePixelRatio ||
+                        context.backingStorePixelRatio || 1;
+    var pixelRatio = devicePixelRatio / backingStoreRatio;
+
     $(function(){
         $(".qrcode").click(function(e)
         {
-            var qrcode = document.createElement('div');
+            var qrcode = document.createElement('span');
             $(qrcode).qrcode({
-                size: 300,
+                size: 600 * pixelRatio,
 
                 ecLevel: 'H',
 
                 fill: '#000',
                 background: '#fff',
-                text: '{"desc":"'+$(this).attr('meatdesc')+'","id":"'+$(this).attr('meatid')+'"}',
+                text: '{"desc":"'+$(this).attr('desc')+'","id":"'+$(this).attr('ident')+'"}',
 
                 mode: 2,
-                mSize: 0.08,
-                mPosY: 0.80,
-                fontname: 'Accidental Presidency',
-                fontcolor: '#f00',
+                mSize: 0.11,
+                mPosY: 0.81,
+                fontname: 'Amatic SC',
+                fontcolor: '#c00',
 
-                label: $(this).attr('meatdesc')
+                label: $(this).attr('desc')
             });
 
-            alertify.alert($(this).attr('meatdesc'), qrcode);
+            var theCanvas = $(qrcode).children('canvas')
+                                    .css({'width':'300px',
+                                         'height':'300px',
+                                         'display':'block',
+                                         'margin-left':'auto',
+                                         'margin-right':'auto'});
+            alertify.alert($(this).attr('desc'), qrcode);
         });
     });
     </script>
