@@ -116,6 +116,32 @@
             alertify.alert($(this).attr('desc'), qrcode);
         });
     });
+
+    // Align decimal points
+    $('.aligndecimals').each(function()
+    {
+        var wholePart, fractionPart;
+        var parts = $(this).text().split('.');
+        wholePart = parts.shift();
+        fractionPart = parts.shift();
+        var html = '<span style="float:left;text-align:right;width:3em;">' + wholePart + '.</span>';
+        html += '<span style="text-align:left;">' + fractionPart + '</span>';
+        $(this).html(html);
+    });
+
+    // Colorize locations
+    $('.location').each(function()
+    {
+        if($(this).text() == 'Mt Vernon')
+        {
+            $(this).addClass('mtvernon');
+        }
+        else if($(this).text() == 'Cienega Barn')
+        {
+            $(this).addClass('cienegabarn');
+        }
+    });
+
     </script>
 
 </body>
