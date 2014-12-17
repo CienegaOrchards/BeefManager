@@ -81,6 +81,43 @@ tr:first-child th:last-child
     text-decoration: line-through;
 }
 
+/* qrcode layout */
+
+@media print {
+
+    @page
+    {
+        size: 8.5in 11in;
+        margin-top: 1in;
+        margin-left: 0.5in;
+        margin-right: 0.5in;
+        margin-bottom: 0;
+    }
+
+}
+
+.qrcodes
+{
+    padding: 0;
+    margin: 0;
+    line-height: 0;
+    max-width: 7.5in;
+}
+
+.qrcodes .qrcode
+{
+    display: inline-block;
+    padding: 0.125in;
+}
+
+.qrcode canvas
+{
+    width: 1in;
+    height: 1in;
+    padding: 0.0625in;
+    display: block;
+}
+
 /* Locations colorized */
 
 .mtvernon

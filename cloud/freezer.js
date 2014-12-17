@@ -34,7 +34,7 @@ module.exports = exports = function(app)
         freezers.comparator = function(object)
         {
             return object.get('location')+'|'+object.get('identifier');
-        }
+        };
         freezers.fetch({
             success: function(freezers)
             {

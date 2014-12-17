@@ -4,6 +4,7 @@ Parse.Cloud.define('navItems', function(req,res)
 {
     var menu = [
         {title: 'Inventory', link: '/inventory'},
+        {title: 'QR Codes', link: '/qrcodes'},
     ];
 
     if(req.params.user !== undefined && req.params.user)

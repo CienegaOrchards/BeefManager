@@ -75,22 +75,12 @@
     })();
     </script>
     <script>
-    var devicePixelRatio = window.devicePixelRatio || 1;
-    var tempCanvas = document.createElement('canvas');
-    var context = tempCanvas.getContext('2d');
-    var backingStoreRatio = context.webkitBackingStorePixelRatio ||
-                        context.mozBackingStorePixelRatio ||
-                        context.msBackingStorePixelRatio ||
-                        context.oBackingStorePixelRatio ||
-                        context.backingStorePixelRatio || 1;
-    var pixelRatio = devicePixelRatio / backingStoreRatio;
-
     $(function(){
         $(".qrcode").click(function(e)
         {
             var qrcode = document.createElement('span');
-            $(qrcode).qrcode({
-                size: 600 * pixelRatio,
+            $(qrcode).addClass('qrcode').qrcode({
+                size: 600,
 
                 ecLevel: 'H',
 
@@ -98,23 +88,18 @@
                 background: '#fff',
                 text: '{"desc":"'+$(this).attr('desc')+'","id":"'+$(this).attr('ident')+'"}',
 
-                minVersion: 10,
-                maxVersion: 10,
+                minVersion: 13,
+                maxVersion: 13,
+                quiet: 4,
                 mode: 2,
-                mSize: 0.11,
-                mPosY: 0.81,
+                mSize: 0.13,
+                mPosY: 0.78,
                 fontname: 'Amatic SC',
                 fontcolor: '#c00',
 
                 label: $(this).attr('desc')
             });
 
-            var theCanvas = $(qrcode).children('canvas')
-                                    .css({'width':'1in',
-                                         'height':'1in',
-                                         'display':'block',
-                                         'margin-left':'auto',
-                                         'margin-right':'auto'});
             alertify.alert($(this).attr('desc'), qrcode);
         });
     });

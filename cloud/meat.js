@@ -218,4 +218,57 @@ Parse.Cloud.define('moveMeatIDToLocation', function(req, res)
 
 module.exports = exports = function(app)
 {
+
+    // QR CODES
+    // ========
+    app.get('/qrcodes', function(req, res) {
+        // If user exists, fetch their info for display
+        if(Parse.User.current()) { Parse.User.current().fetch(); }
+        else { req.session.postLoginPage = '/qrcodes'; }
+
+        // Query for Meat that is in the price list
+        var meatQuery = new Parse.Query('Meat')
+            .include('cut')
+            .include('freezer')
+            .include('animal');
+
+        // Parse.Query.ascending(xyz) won't let you sort by sub-object fields like cut.species,
+        // so we form a collection and sort using a comparator
+        var meats = meatQuery.collection();
+        meats.comparator = function(object)
+        {
+            var cut = object.get('cut');
+            // Use | as separator because at least in ASCII it's alphabetically later than all letters
+            return cut.get('species')+'|'+cut.get('category')+'|'+cut.get('cut');
+        };
+
+        var freezerQuery = new Parse.Query('Freezer');
+        var freezers = freezerQuery.collection();
+        freezers.comparator = function(object)
+        {
+            return object.get('location')+'|'+object.get('identifier');
+        };
+        freezers.fetch({
+            success: function(freezers)
+            {
+                meats.fetch({
+                    success: function(meats)
+                    {
+                        res.render('qrcodes', { user: Parse.User.current(), meats: meats, freezers: freezers });
+                    },
+                    error: function(err)
+                    {
+                        res.json(500, err);
+                    }
+                });
+            },
+            error: function(err)
+            {
+                res.json(500, err);
+            }
+        });
+
+    });
+
+
 };
