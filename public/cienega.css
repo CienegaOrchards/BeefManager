@@ -7,6 +7,12 @@ body
     padding: 30px;
 }
 
+div#menu
+{
+    font-size: 150%;
+    height: 2em;
+}
+
 form.idealforms label.main
 {
     margin-top: 0;
