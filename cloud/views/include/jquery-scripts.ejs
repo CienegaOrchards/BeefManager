@@ -1,2 +1,29 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
+<script>
+
+var alignDecimals = function(i,e)
+{
+    var wholePart, fractionPart;
+    var parts = $(e).text().split('.');
+    wholePart = parts.shift();
+    fractionPart = parts.shift();
+    var html = '<span style="float:left;text-align:right;width:3em;">' + wholePart + '.</span>';
+    html += '<span style="text-align:left;">' + fractionPart + '</span>';
+    $(e).html(html);
+}
+
+
+var colorizeLocation = function(i,e)
+{
+    if($(e).text() == 'Mt Vernon')
+    {
+        $(e).addClass('mtvernon');
+    }
+    else if($(e).text() == 'Cienega Barn')
+    {
+        $(e).addClass('cienegabarn');
+    }
+}
+</script>
