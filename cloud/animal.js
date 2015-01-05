@@ -47,7 +47,7 @@ Parse.Cloud.define('getOrMakeAnimal', function(req,res)
         {
             res.json(400, new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'Failed to specify species'));
         }
-        else if(req.params.butcheryDate == undefined)
+        else if(req.params.butcheryDate === undefined)
         {
             res.json(400, new Parse.Error(Parse.Error.MISSING_OBJECT_ID, 'Failed to specify butcheryDate'));
         }
