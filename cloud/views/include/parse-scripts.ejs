@@ -4,32 +4,37 @@ var logOut;
 
 var doMenu = function()
 {
-    // Populate the menu
-    Parse.Cloud.run('navItems', null, {
-        success: function(items)
-        {
-            $('#menu').empty();
-            items.forEach(function(item)
-            {
-                var menuItem = $('<span></span>').addClass('menuItem').html($('<a>',
-                {
-                    text: item.title,
-                    href: item.link
-                })).appendTo('#menu');
+    var menu = [
+        {title: 'Inventory', link: '/inventory'},
+        {title: 'Prices', link: '/prices'},
+        {title: 'QR Codes', link: '/qrcodes'},
+    ];
 
-                if(item.title == 'Login')
-                {
-                    menuItem.click(logIn);
-                }
-                else if((/^Logout/).test(item.title))
-                {
-                    menuItem.click(logOut);
-                }
-            });
-        },
-        error: function(err)
+    if(Parse.User.current())
+    {
+        menu.push({title: 'Logout (' + Parse.User.current().get('realname') + ')', link: '#'});
+    }
+    else
+    {
+        menu.push({title: 'Login', link: '#'});
+    }
+
+    $('#menu').empty();
+    menu.forEach(function(item)
+    {
+        var menuItem = $('<span></span>').addClass('menuItem').html($('<a>',
         {
-            $('#menu').html("Error: "+JSON.stringify(err));
+            text: item.title,
+            href: item.link
+        })).appendTo('#menu');
+
+        if(item.title == 'Login')
+        {
+            menuItem.click(logIn);
+        }
+        else if((/^Logout/).test(item.title))
+        {
+            menuItem.click(logOut);
         }
     });
 }
@@ -46,16 +51,7 @@ logIn = function()
     Parse.FacebookUtils.logIn('public_profile,email', {
       success: function(user) {
         // Populate the menu
-        Parse.Cloud.run('navItems', null, {
-            success: function(items)
-            {
-                doMenu();
-            },
-            error: function(err)
-            {
-                $('#menu').html("Error: "+JSON.stringify(err));
-            }
-        });
+        doMenu();
       },
       error: function(user, error) {
         alert("User cancelled the Facebook login or did not fully authorize.");
@@ -76,4 +72,6 @@ logOut = function()
     Parse.User.logOut();
     doMenu();
 }
+
+$(doMenu);
 </script>
