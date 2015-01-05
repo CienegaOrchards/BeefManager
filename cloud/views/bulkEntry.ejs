@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include include/jquery-header.ejs %>
+    <% include include/parse-header.ejs %>
+    <% include include/alertify-header.ejs %>
+    <% include include/idealforms-header.ejs %>
+    <% include include/cienegacss.ejs %>
+    <% var moment = require('moment'); %>
+    <title>Bulk Entry</title>
+</head>
+<body>
+    <div id='menu'></div>
+
+    <div id='content'>
+        <span id='form'>
+            <div class="idealsteps-container">
+
+                <nav class="idealsteps-nav"></nav>
+
+                <form action='' novalidate autocomplete='off' class='idealforms'>
+
+                    <div class="idealsteps-wrap">
+
+                        <div class="field">
+                            <label class="main">Species:</label>
+                            <select name="species">
+                              <option value="beef">Beef</option>
+                              <option value="chicken">Chicken</option>
+                              <option value="lamb">Lamb</option>
+                              <option value="goat">Goat</option>
+                              <option value="venison">Venison</option>
+                            </select>
+                            <span class="error"></span>
+                        </div>
+
+
+                        <div class="field">
+                            <label class="main">Cut:</label>
+                            <input name="cut" type="text" data-idealforms-rules="required cut">
+                            <span class="error"></span>
+                        </div>
+
+                        <div class="field buttons">
+                            <button type="submit">Submit</button>
+                        </div>
+
+                    </div>
+
+                    <span id="invalid"></span>
+
+                </form>
+
+            </div>
+        </span>
+
+        <span id='rows'>
+        </span>
+     </div>
+
+    <% include include/jquery-scripts.ejs %>
+    <% include include/parse-scripts.ejs %>
+    <% include include/qrcode-scripts.ejs %>
+    <% include include/alertify-scripts.ejs %>
+    <% include include/idealforms-scripts.ejs %>
+
+    <script>
+    $('form.idealforms').idealforms({
+
+        silentLoad: false,
+
+        rules: {
+            'cut': 'required'
+        },
+
+        onSubmit: function(invalid, e)
+        {
+            e.preventDefault();
+            if(invalid)
+            {
+                $('#invalid')
+                    .show()
+                    .toggleClass('valid', ! invalid)
+                    .text(invalid ? (invalid +' invalid fields') : 'All good!');
+            }
+            else
+            {
+                // do something with valid form
+            }
+        }
+    });
+
+    $('form.idealforms').find('input, select, textarea').on('change keyup', function() {
+      $('#invalid').hide();
+    });
+
+    </script>
+
+</body>
+</html>

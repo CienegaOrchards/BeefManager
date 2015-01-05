@@ -266,5 +266,5 @@ module.exports = exports = function(app)
 
     });
 
-
+    app.get('/bulkEntry', function(req, res) { res.render('bulkEntry'); });
 };
