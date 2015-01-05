@@ -9,10 +9,6 @@ module.exports = exports = function(app)
     // INVENTORY
     // =========
     app.get('/inventory', function(req, res) {
-        // If user exists, fetch their info for display
-        if(Parse.User.current()) { Parse.User.current().fetch(); }
-        else { req.session.postLoginPage = '/inventory'; }
-
         // Query for Meat that is in the price list
         var meatQuery = new Parse.Query('Meat')
             .include('cut')
@@ -41,7 +37,7 @@ module.exports = exports = function(app)
                 meats.fetch({
                     success: function(meats)
                     {
-                        res.render('inventory', { user: Parse.User.current(), meats: meats, freezers: freezers });
+                        res.render('inventory', { meats: meats, freezers: freezers });
                     },
                     error: function(err)
                     {

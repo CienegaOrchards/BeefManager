@@ -8,26 +8,72 @@
     <title>Login Page</title>
 </head>
 <body>
-    <form class="idealforms" autocomplete="off" method="post" action="/login">
-        <div class="field">
-            <label class="main">Username:</label>
-            <input name="username" type="text" data-idealforms-rules="required"/>
-            <span class="error"></span>
-        </div>
+    <div id='menu'></div>
+    <div id='content'>
+        <form class="idealforms" autocomplete="off" method="post" action="/login">
+            <div class="field">
+                <label class="main">Username:</label>
+                <input name="username" type="text" data-idealforms-rules="required"/>
+                <span class="error"></span>
+            </div>
 
-        <div class="field">
-            <label class="main">Password:</label>
-            <input name="password" type="password" data-idealforms-rules="required"/>
-            <span class="error"></span>
-        </div>
+            <div class="field">
+                <label class="main">Password:</label>
+                <input name="password" type="password" data-idealforms-rules="required"/>
+                <span class="error"></span>
+            </div>
 
-        <div class="field buttons">
-            <label class="main">&nbsp;</label>
-            <button type="submit">Submit</button>
-        </div>
-    </form>
+            <div class="field buttons">
+                <label class="main">&nbsp;</label>
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+
+        <div class="response"></div>
+    </div>
 
     <% include include/jquery-scripts.ejs %>
     <% include include/idealforms-scripts.ejs %>
+    <% include include/parse-scripts.ejs %>
+
+
+    <script>
+      window.fbAsyncInit = function() {
+        Parse.FacebookUtils.init({ // this line replaces FB.init({
+          appId      : '192526427617368', // Facebook App ID
+          version    : 'v2.2',
+          cookie     : true, // enable cookies to allow Parse to access the session
+          xfbml      : false
+        });
+
+        Parse.FacebookUtils.logIn('public_profile,email', {
+          success: function(user) {
+            // Populate the menu
+            Parse.Cloud.run('navItems', null, {
+                success: function(items)
+                {
+                    doMenu();
+                },
+                error: function(err)
+                {
+                    $('#menu').html("Error: "+JSON.stringify(err));
+                }
+            });
+          },
+          error: function(user, error) {
+            $('.response').html("User cancelled the Facebook login or did not fully authorize.");
+          }
+        });
+      };
+
+      (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
+
 </body>
 </html>

@@ -222,10 +222,6 @@ module.exports = exports = function(app)
     // QR CODES
     // ========
     app.get('/qrcodes', function(req, res) {
-        // If user exists, fetch their info for display
-        if(Parse.User.current()) { Parse.User.current().fetch(); }
-        else { req.session.postLoginPage = '/qrcodes'; }
-
         // Query for Meat that is in the price list
         var meatQuery = new Parse.Query('Meat')
             .include('cut')
@@ -254,7 +250,7 @@ module.exports = exports = function(app)
                 meats.fetch({
                     success: function(meats)
                     {
-                        res.render('qrcodes', { user: Parse.User.current(), meats: meats, freezers: freezers });
+                        res.render('qrcodes', { meats: meats, freezers: freezers });
                     },
                     error: function(err)
                     {

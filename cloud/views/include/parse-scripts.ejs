@@ -1,18 +1,30 @@
 <script>
-$(function()
+var logIn;
+var logOut;
+
+var doMenu = function()
 {
     // Populate the menu
-    Parse.Cloud.run('navItems', { user: <%- JSON.stringify(user) %> },{
+    Parse.Cloud.run('navItems', null, {
         success: function(items)
         {
             $('#menu').empty();
             items.forEach(function(item)
             {
-                $('<span></span>').addClass('menuItem').html($('<a>',
+                var menuItem = $('<span></span>').addClass('menuItem').html($('<a>',
                 {
                     text: item.title,
                     href: item.link
                 })).appendTo('#menu');
+
+                if(item.title == 'Login')
+                {
+                    menuItem.click(logIn);
+                }
+                else if((/^Logout/).test(item.title))
+                {
+                    menuItem.click(logOut);
+                }
             });
         },
         error: function(err)
@@ -20,5 +32,48 @@ $(function()
             $('#menu').html("Error: "+JSON.stringify(err));
         }
     });
-});
+}
+
+logIn = function()
+{
+    Parse.FacebookUtils.init({ // this line replaces FB.init({
+      appId      : '192526427617368', // Facebook App ID
+      version    : 'v2.2',
+      cookie     : true, // enable cookies to allow Parse to access the session
+      xfbml      : false
+    });
+
+    Parse.FacebookUtils.logIn('public_profile,email', {
+      success: function(user) {
+        // Populate the menu
+        Parse.Cloud.run('navItems', null, {
+            success: function(items)
+            {
+                doMenu();
+            },
+            error: function(err)
+            {
+                $('#menu').html("Error: "+JSON.stringify(err));
+            }
+        });
+      },
+      error: function(user, error) {
+        alert("User cancelled the Facebook login or did not fully authorize.");
+      }
+    });
+};
+
+(function(d, s, id){
+var js, fjs = d.getElementsByTagName(s)[0];
+if (d.getElementById(id)) {return;}
+js = d.createElement(s); js.id = id;
+js.src = "//connect.facebook.net/en_US/sdk.js";
+fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+logOut = function()
+{
+    Parse.User.logOut();
+    doMenu();
+}
 </script>

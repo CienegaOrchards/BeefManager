@@ -4,20 +4,41 @@ Parse.Cloud.define('navItems', function(req,res)
 {
     var menu = [
         {title: 'Inventory', link: '/inventory'},
+        {title: 'Prices', link: '/prices'},
         {title: 'QR Codes', link: '/qrcodes'},
     ];
 
-    if(req.params.user !== undefined && req.params.user)
+    Parse.Promise.as(Parse.User.current())
+    .then(function(isAuth)
     {
-        menu.push({title: 'Prices', link: '/prices'});
-        menu.push({title: 'Logout ('+req.params.user.realname+')', link: '/logout'});
-    }
-    else
-    {
-        menu.push({title: 'Login', link: '/login'});
-    }
+        if(isAuth)
+        {
+            return isAuth.fetch();
+        }
+        else
+        {
+            return Parse.Promise.as(null);
+        }
+    })
 
-    res.success(menu);
+    .then(function(user)
+    {
+        if(user)
+        {
+            menu.push({title: 'Logout ('+user.get('realname')+')', link: '#'});
+        }
+        else
+        {
+            menu.push({title: 'Login', link: '#'});
+        }
+
+        return menu;
+    })
+
+    .then(function(theMenu)
+    {
+        res.success(theMenu);
+    });
 });
 
 
