@@ -23,11 +23,6 @@ body
     padding-top: 1.5em;
 }
 
-.soldout
-{
-    text-decoration: line-through;
-}
-
 /* qrcode layout */
 
 @media print {
@@ -41,6 +36,10 @@ body
         margin-bottom: 0;
     }
 
+    body
+    {
+        padding: 0;
+    }
 }
 
 .qrcodes
@@ -69,21 +68,4 @@ body
 {
     width: 2in;
     height: 2in;
-}
-
-/* Locations colorized */
-
-.mtvernon
-{
-    color: #0C0;
-}
-
-.cienegabarn
-{
-    color: #00C;
-}
-
-.menuItem
-{
-    padding: 0.5em;
 }
