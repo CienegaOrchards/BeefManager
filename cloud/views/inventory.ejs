@@ -3,114 +3,120 @@
 <head>
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
-    <% include include/alertify-header.ejs %>
+    <% include include/semantic-header.ejs %>
     <% include include/cienegacss.ejs %>
     <% var moment = require('moment'); %>
+
     <title>Inventory</title>
+
 </head>
 <body>
     <div id='menu'></div>
 
     <div id='content'>
-        <table summary="Prices of meats">
-            <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Qty</th><th>Price</th><th>Location</th><th>Freezer</th><th>Slaughtered</th><th>Barcode</th></tr></thead></thead>
-            <tbody>
-                <%
-                var prev_species='', prev_cat = '', prev_cut = '';
-                meats.forEach(function(meat) {
-                    var cut = meat.get('cut');
-                    var freezer = meat.get('freezer');
-                    var animal = meat.get('animal');
-                    %>
-                    <tr>
-                        <td><% if(cut.get('species') != prev_species) { prev_species = cut.get('species') %><%= prev_species %><% } %></td>
-                        <td><% if(cut.get('category') != prev_cat) { prev_cat = cut.get('category') %><%= prev_cat === undefined ? '' : prev_cat %><% } %></td>
-                        <td><% if(cut.get('cut') != prev_cut) { prev_cut = cut.get('cut') %><%= prev_cut === undefined ? '' : prev_cut %><% } %></td>
-                        <td><span class='aligndecimals'><%= meat.get('units').toFixed(2) %></span><span style='float:right;'>&nbsp;<%= cut.get('units') %></span></td>
-                        <td><span style='float:left;'>$</span> <span class='aligndecimals'><%= (meat.get('units') * cut.get('price')).toFixed(2) %></span></td>
-                        <td><span class='location'><%= freezer === undefined || freezer === null ? meat.get('location') : freezer.get('location') %></span></td>
-                        <td><%= freezer === undefined || freezer === null ? '' : freezer.get('identifier') %></td>
-                        <td><%= animal === undefined || animal === null ? '' : moment(animal.get('slaughtered')).fromNow() %></td>
-                        <td><a href='#' class='button qrcode' desc='<%= meat.get('units')+cut.get('units')+" "+prev_species+" "+prev_cut %>' ident='<%= meat.id %>'>Show</a></td>
-                    </tr>
-                <% }) %>
-            </tbody>
-        </table>
-        <br /><br /><hr /><br /><br />
-        <table summary="List of freezers">
-            <thead>
-                <tr><th>Location</th><th>Freezer</th><th>Barcode</th></tr>
-            </thead>
-            <tbody>
-                <%
-                freezers.forEach(function(freezer) {
-                %>
-                    <tr>
-                        <td><span class='location'><%= freezer.get('location') %></span></td>
-                        <td><%= freezer.get('identifier') %></td>
-                        <td><a href='#' class='button qrcode' desc='<%= freezer.get('location')+' - '+freezer.get('identifier') %>' ident='<%= freezer.id %>'>Show</a></td>
+<%
+    var prev_species=null, prev_category=null;
 
-                    </tr>
-                <% }); %>
-            </tbody>
-        </table>
+    meats.forEach(function(meat)
+    {
+        var cut = meat.get('cut');
+        var freezer = meat.get('freezer');
+        var animal = meat.get('animal');
+        var species = cut.get('species');
+        var category = cut.get('category');
+
+        if(species != prev_species)
+        {
+            if(prev_species)
+            {
+                // New species, so reset categories
+                prev_category = null;
+                // Close the previous category and species DIVs
+%>
+                </div>
+            </div>
+        </div>
+<%
+            }
+            // Now open a new species div and label it
+            prev_species = species;
+%>
+        <div class="ui segment">
+            <div class="ui top attached header inverted">
+                <h1 class="ui header inverted"><%= prev_species %></h1>
+            </div>
+            <div class="ui attached segment">
+<%
+        }
+
+        if(category != prev_category)
+        {
+            if(prev_category)
+            {
+                // Close the previous category cards DIV
+%>
+                </div>
+                <div class="ui divider"></div>
+<%
+            }
+            // Now open a category div and label it
+            prev_category = category;
+%>
+
+                <a class="ui ribbon label"><%= prev_category %></a>
+                <div class="ui cards">
+<%
+        }
+%>
+                    <div class="ui card">
+                        <div class="content">
+                            <div class="header">
+                                <i class="selected radio icon"></i>
+                                <%= cut.get('cut') === undefined ? '' : cut.get('cut') %>
+                            </div>
+                            <div class="description">
+
+                                <div class="content">
+                                  <div class="header">Weight</div>
+                                  <%= meat.get('units').toFixed(2) + '&nbsp;' + cut.get('units') %>
+                                </div>
+
+                                <div class="content">
+                                  <div class="header">Price</div>
+                                  $<%= (meat.get('units') * cut.get('price')).toFixed(2) %>
+                                </div>
+
+                                <div class="content">
+                                    <div class="header">Slaughtered</div>
+                                    <%= animal === undefined || animal === null ? '' : moment(animal.get('slaughtered')).fromNow() %>
+                                </div>
+
+                                <div class="content">
+                                    <div class="header">Location</div>
+                                    <span class='location'><%= freezer === undefined || freezer === null ? meat.get('location') : freezer.get('location') %></span>
+                                </div>
+
+                                <div class="content">
+                                    <div class="header">Freezer</div>
+                                    <%= freezer === undefined || freezer === null ? '' : freezer.get('identifier') %>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+<%
+    });
+    // Finally close out category and species DIVs
+%>
+                </div>
+            </div>
+        </div>
     </div>
 
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
-    <% include include/qrcode-scripts.ejs %>
-    <% include include/alertify-scripts.ejs %>
-
-    <script type="text/javascript">
-    WebFontConfig = {
-        google: { families: [ 'Amatic+SC:700:latin' ] }
-    };
-    (function() {
-        var wf = document.createElement('script');
-        wf.src = '//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-        wf.type = 'text/javascript';
-        wf.async = 'true';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(wf, s);
-    })();
-    </script>
-    <script>
-    $(function(){
-        $(".qrcode").click(function(e)
-        {
-            var qrcode = document.createElement('span');
-            $(qrcode).addClass('qrcode').qrcode({
-                size: 600,
-
-                ecLevel: 'H',
-
-                fill: '#000',
-                background: '#fff',
-                text: '{"desc":"'+$(this).attr('desc')+'","id":"'+$(this).attr('ident')+'"}',
-
-                minVersion: 13,
-                maxVersion: 13,
-                quiet: 4,
-                mode: 2,
-                mSize: 0.13,
-                mPosY: 0.78,
-                fontname: 'Amatic SC',
-                fontcolor: '#c00',
-
-                label: $(this).attr('desc')
-            });
-
-            alertify.alert($(this).attr('desc'), qrcode);
-        });
-    });
-
-    // Align decimal points
-    $('.aligndecimals').each(alignDecimals);
-
-    // Colorize locations
-    $('.location').each(colorizeLocation);
-
-    </script>
+    <% include include/semantic-scripts.ejs %>
 
 </body>
 </html>
