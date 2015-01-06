@@ -4,17 +4,17 @@
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
     <% include include/semantic-header.ejs %>
+    <% include include/alertify-header.ejs %>
+    <% include include/cienegacss.ejs %>
     <% var moment = require('moment'); %>
 
     <title>Inventory</title>
 
 </head>
 <body>
-    <div class="ui fixed main menu"></div>
+    <div class="ui fixed inverted teal main menu"></div>
 
-    <div class="ui divider"></div>
-
-    <div class="container">
+    <div class="main content">
 <%
     var prev_species=null, prev_category=null;
 
@@ -42,11 +42,9 @@
             // Now open a new species div and label it
             prev_species = species;
 %>
-        <div class="ui segment">
-            <div class="ui top attached header">
-                <h1 class="ui header"><%= prev_species %></h1>
-            </div>
-            <div class="ui attached segment">
+        <div class="ui raised segment">
+            <a class="ui top attached massive label"><%= prev_species %></a>
+            <div class="content">
 <%
         }
 
@@ -57,52 +55,52 @@
                 // Close the previous category cards DIV
 %>
                 </div>
-                <div class="ui divider"></div>
 <%
             }
             // Now open a category div and label it
             prev_category = category;
 %>
 
-                <a class="ui ribbon label"><%= prev_category %></a>
+                <a class="ui big teal ribbon label"><%= prev_category %></a>
                 <div class="ui cards">
 <%
         }
 %>
                     <div class="ui card">
                         <div class="content">
-                            <div class="header">
-                                <i class="selected radio icon"></i>
-                                <%= cut.get('cut') === undefined ? '' : cut.get('cut') %>
+                            <i class="right floated big qrcode icon"
+                                desc="<%= meat.get('units')+cut.get('units')+" "+cut.get('species')+" "+cut.get('cut') %>"
+                                    ident="<%= meat.id %>"></i>
+
+                            <div class="right floated">
+                                <div class="ui green tag label">$<%= (meat.get('units') * cut.get('price')).toFixed(2) %></div>
                             </div>
-                            <div class="description">
+                            <div class="header"><%= cut.get('cut') === undefined ? '' : cut.get('cut') %></div>
+                            <div class="meta"><%= meat.get('units').toFixed(2) +
+                                                     '&nbsp;' +
+                                                     cut.get('units') +
+                                                     '&nbsp; @ $' +
+                                                     cut.get('price').toFixed(2) +
+                                                     '/' + cut.get('units') %></div>
 
-                                <div class="content">
-                                  <div class="header">Weight</div>
-                                  <%= meat.get('units').toFixed(2) + '&nbsp;' + cut.get('units') %>
-                                </div>
-
-                                <div class="content">
-                                  <div class="header">Price</div>
-                                  $<%= (meat.get('units') * cut.get('price')).toFixed(2) %>
-                                </div>
-
-                                <div class="content">
-                                    <div class="header">Slaughtered</div>
-                                    <%= animal === undefined || animal === null ? '' : moment(animal.get('slaughtered')).fromNow() %>
-                                </div>
-
-                                <div class="content">
-                                    <div class="header">Location</div>
-                                    <span class='location'><%= freezer === undefined || freezer === null ? meat.get('location') : freezer.get('location') %></span>
-                                </div>
-
-                                <div class="content">
-                                    <div class="header">Freezer</div>
-                                    <%= freezer === undefined || freezer === null ? '' : freezer.get('identifier') %>
-                                </div>
-
+                            <div class="left floated">
+                                <i class="home icon"></i>
+                                <%= freezer === undefined || freezer === null ? meat.get('location') : freezer.get('location') %>
                             </div>
+
+                            <div class="left floated">
+                                <i class="power icon"></i>
+                                <%= freezer === undefined || freezer === null ? '' : freezer.get('identifier') %>
+                            </div>
+                        </div>
+
+                        <div class="extra content">
+
+                            <div class="left floated">
+                                <i class="calendar icon"></i>
+                                Butchered <%= animal === undefined || animal === null ? '' : moment(animal.get('slaughtered')).fromNow() %>
+                            </div>
+
                         </div>
                     </div>
 
@@ -118,6 +116,76 @@
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
     <% include include/semantic-scripts.ejs %>
+    <% include include/qrcode-scripts.ejs %>
+    <% include include/alertify-scripts.ejs %>
 
+<div class="ui small modal qrcode">
+  <i class="close icon"></i>
+  <div class="header">
+    QR Code
+  </div>
+  <div class="content">
+    <div class="ui image qrcode center aligned"></div>
+  </div>
+  <div class="actions">
+    <div class="ui positive button">
+      OK
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+    $(function()
+    {
+        var fonts = $.Deferred();
+        WebFontConfig = {
+            google: { families: [ 'Amatic+SC:700:latin' ] },
+            active: function() { fonts.resolve(); }
+        };
+
+        var wf = document.createElement('script');
+        wf.src = '//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+
+        fonts.done(function()
+                    {
+                        $("i.qrcode").click(function(e)
+                        {
+                            var ident = $(this).attr('ident');
+                            var desc = $(this).attr('desc');
+
+                            $('.modal.qrcode .image.qrcode').empty();
+
+                            $('.modal.qrcode .image.qrcode').qrcode({
+                                size: 600,
+
+                                ecLevel: 'H',
+
+                                fill: '#000',
+                                background: '#fff',
+                                text: '{"desc":"'+$(this).attr('desc')+'","id":"'+$(this).attr('ident')+'"}',
+
+                                minVersion: 13,
+                                maxVersion: 13,
+                                quiet: 4,
+                                mode: 2,
+                                mSize: 0.13,
+                                mPosY: 0.78,
+                                fontname: 'Amatic SC',
+                                fontcolor: '#c00',
+
+                                label: $(this).attr('desc')
+                            });
+
+                            $('.modal.qrcode>.header').html(desc);
+
+                            $('.modal.qrcode').modal('show');
+                        });
+                    });
+    });
+    </script>
 </body>
 </html>

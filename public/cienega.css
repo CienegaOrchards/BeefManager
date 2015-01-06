@@ -1,89 +1,30 @@
-@import url(//fonts.googleapis.com/css?family=Noto+Sans);
-
 body
 {
-    font-family: "Noto Sans", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-    font-weight:300;
-    padding: 30px;
+    padding: 3em;
 }
 
-div#menu
+.card
 {
-    font-size: 150%;
-    height: 2em;
+    min-width:  23em;
 }
 
-form.idealforms label.main
+.card .content>div.meta
 {
-    margin-top: 0;
+    padding-bottom: 1em;
 }
 
-table
+.card .content>div.left.floated
 {
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin:0px;padding:0px;
+    padding-right: 1em;
 }
 
-tr:hover td
+.raised.segment>.content
 {
-    background-color: #ccc;
-}
-
-tr:nth-child(odd)
-{
-    background-color:#eee;
-}
-
-td
-{
-    vertical-align:middle;
-    border:1px solid #000000;
-    border-width:0px 1px 1px 0px;
-    text-align:left;
-    padding:7px;
-    font-weight:normal;
-}
-
-tr:last-child td
-{
-    border-width:0px 1px 0px 0px;
-}
-
-tr td:last-child
-{
-    border-width:0px 0px 1px 0px;
-}
-
-tr:last-child td:last-child
-{
-    border-width:0px 0px 0px 0px;
-}
-
-th
-{
-    background-color:#ccc;
-    border:0px solid #000000;
-    text-align:center;
-    border-width:0px 0px 1px 1px;
-    font-size:120%;
-    font-weight:bold;
-    padding: 10px;
-}
-
-tr:first-child th:first-child
-{
-    border-width:0px 0px 1px 0px;
-}
-
-tr:first-child th:last-child
-{
-    border-width:0px 0px 1px 1px;
+    padding-top: 1.5em;
 }
 
 .soldout
 {
-    color: #aaa;
     text-decoration: line-through;
 }
 
@@ -116,12 +57,18 @@ tr:first-child th:last-child
     padding: 0.125in;
 }
 
-.qrcode canvas
+.qrcodes .qrcode canvas
 {
     width: 1in;
     height: 1in;
     padding: 0.0625in;
     display: block;
+}
+
+.modal.qrcode .image.qrcode canvas
+{
+    width: 2in;
+    height: 2in;
 }
 
 /* Locations colorized */

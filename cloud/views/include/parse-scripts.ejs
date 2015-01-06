@@ -10,15 +10,6 @@ var doMenu = function()
         {title: 'QR Codes', link: '/qrcodes'},
     ];
 
-    if(Parse.User.current())
-    {
-        menu.push({title: 'Logout (' + Parse.User.current().get('realname') + ')', link: '#'});
-    }
-    else
-    {
-        menu.push({title: 'Login', link: '#'});
-    }
-
     $('.main.menu').empty();
     menu.forEach(function(item)
     {
@@ -28,15 +19,33 @@ var doMenu = function()
             href: item.link
         }).addClass('item').appendTo('.main.menu');
 
-        if(item.title == 'Login')
+        if(item.link == location.pathname)
         {
-            menuItem.click(logIn);
-        }
-        else if((/^Logout/).test(item.title))
-        {
-            menuItem.click(logOut);
+            menuItem.addClass('active');
         }
     });
+
+    var logInOrOutMenuItem;
+    if(Parse.User.current())
+    {
+        logInOrOutMenuItem = $('<a></a>',
+        {
+            text: 'Logout (' + Parse.User.current().get('realname') + ')',
+            href: '#'
+        }).addClass('item');
+        logInOrOutMenuItem.click(logOut);
+    }
+    else
+    {
+        logInOrOutMenuItem = $('<a></a>',
+        {
+            text: 'Login',
+            href: '#'
+        }).addClass('item');
+        logInOrOutMenuItem.click(logIn);
+    }
+
+    $('<div></div>').addClass('right menu').append(logInOrOutMenuItem).appendTo('.main.menu');
 }
 
 logIn = function()
