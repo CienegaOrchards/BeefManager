@@ -19,14 +19,14 @@ var doMenu = function()
         menu.push({title: 'Login', link: '#'});
     }
 
-    $('#menu').empty();
+    $('.main.menu').empty();
     menu.forEach(function(item)
     {
-        var menuItem = $('<span></span>').addClass('menuItem').html($('<a>',
+        var menuItem = $('<a></a>',
         {
             text: item.title,
             href: item.link
-        })).appendTo('#menu');
+        }).addClass('item').appendTo('.main.menu');
 
         if(item.title == 'Login')
         {

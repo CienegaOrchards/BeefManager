@@ -4,16 +4,17 @@
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
     <% include include/semantic-header.ejs %>
-    <% include include/cienegacss.ejs %>
     <% var moment = require('moment'); %>
 
     <title>Inventory</title>
 
 </head>
 <body>
-    <div id='menu'></div>
+    <div class="ui fixed main menu"></div>
 
-    <div id='content'>
+    <div class="ui divider"></div>
+
+    <div class="container">
 <%
     var prev_species=null, prev_category=null;
 
@@ -42,8 +43,8 @@
             prev_species = species;
 %>
         <div class="ui segment">
-            <div class="ui top attached header inverted">
-                <h1 class="ui header inverted"><%= prev_species %></h1>
+            <div class="ui top attached header">
+                <h1 class="ui header"><%= prev_species %></h1>
             </div>
             <div class="ui attached segment">
 <%
