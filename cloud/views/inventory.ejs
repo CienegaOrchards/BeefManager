@@ -75,7 +75,7 @@
                             <div class="right floated">
                                 <div class="ui green tag label">$<%= (meat.get('units') * cut.get('price')).toFixed(2) %></div>
                             </div>
-                            <div class="header"><%= cut.get('cut') === undefined ? '' : cut.get('cut') %></div>
+                            <div class="header"><div class="ui teal small header"><%= cut.get('cut') === undefined ? '' : cut.get('cut') %></div></div>
                             <div class="meta"><%= meat.get('units').toFixed(2) +
                                                      '&nbsp;' +
                                                      cut.get('units') +
