@@ -5,9 +5,9 @@ var logOut;
 var doMenu = function()
 {
     var menu = [
-        {title: 'Inventory', link: '/inventory'},
-        {title: 'Prices', link: '/prices'},
-        {title: 'QR Codes', link: '/qrcodes'},
+        {title: 'Inventory', link: '/inventory', icon: 'list layout'},
+        {title: 'Prices', link: '/prices', icon: 'dollar'},
+        {title: 'QR Codes', link: '/qrcodes', icon: 'qrcode'},
     ];
 
     $('.main.menu').empty();
@@ -17,7 +17,9 @@ var doMenu = function()
         {
             text: item.title,
             href: item.link
-        }).addClass('item').appendTo('.main.menu');
+        }).addClass('item')
+        .prepend($('<i></i>').addClass(item.icon).addClass('large icon'))
+        .appendTo('.main.menu');
 
         if(item.link == location.pathname)
         {
@@ -25,27 +27,33 @@ var doMenu = function()
         }
     });
 
-    var logInOrOutMenuItem;
+    var logInOrOutDetails;
     if(Parse.User.current())
     {
-        logInOrOutMenuItem = $('<a></a>',
-        {
+        logInOrOutDetails = {
             text: 'Logout (' + Parse.User.current().get('realname') + ')',
-            href: '#'
-        }).addClass('item');
-        logInOrOutMenuItem.click(logOut);
+            link: '#',
+            icon: 'ban',
+            fn: logOut
+        }
     }
     else
     {
-        logInOrOutMenuItem = $('<a></a>',
-        {
+        logInOrOutDetails = {
             text: 'Login',
-            href: '#'
-        }).addClass('item');
-        logInOrOutMenuItem.click(logIn);
+            link: '#',
+            icon: 'user',
+            fn: logIn
+        }
     }
 
-    $('<div></div>').addClass('right menu').append(logInOrOutMenuItem).appendTo('.main.menu');
+    $('<a></a>',
+        {
+            text: logInOrOutDetails.text,
+            href: logInOrOutDetails.link
+        }).addClass('right item')
+        .prepend($('<i></i>').addClass(logInOrOutDetails.icon).addClass('large icon'))
+        .appendTo('.main.menu').click(logInOrOutDetails.fn);
 }
 
 logIn = function()
