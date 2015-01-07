@@ -14,7 +14,7 @@
 
     <div class="main content">
         <table class="ui striped collapsing compact teal table priceTable" summary="Prices of meats">
-            <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Price</th></tr></thead></thead>
+            <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Price</th><th>Unit</th></tr></thead></thead>
         </table>
     </div>
 
@@ -30,7 +30,8 @@
                 $('<td>').text(price.get('species')),
                 $('<td>').text(price.get('category')),
                 $('<td>').text(price.get('cut')),
-                $('<td>').addClass('right aligned').text('$' + price.get('price').toFixed(2) + '/' + price.get('units'))
+                $('<td>').addClass('right aligned').text('$' + price.get('price').toFixed(2)),
+                $('<td>').text('/' + price.get('units'))
                 )
             );
     }
