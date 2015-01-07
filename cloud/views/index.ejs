@@ -3,15 +3,20 @@
 <head>
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
+    <% include include/semantic-header.ejs %>
     <% include include/cienegacss.ejs %>
+
     <title>Cienega Orchards Store</title>
+
 </head>
 <body>
-    <div id='menu'></div>
-    <div id='content'></div>
+    <div class="ui fixed large teal main menu"></div>
+
+    <div class="main content"></div>
 
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
+    <% include include/semantic-scripts.ejs %>
 
 </body>
 </html>
