@@ -66,17 +66,5 @@ Parse.Cloud.define('getOrMakePrice', function(req,res)
 
 module.exports = exports = function(app)
 {
-    app.get('/prices', function(req, res) {
-    (new Parse.Query('Prices'))
-        .ascending('-species,category,cut')
-
-        .find({
-            success: function(prices) {
-                res.render('prices', { prices: prices });
-            },
-            error: function(err) {
-              res.json(500, err);
-            }
-        });
-    });
+    app.get('/prices', function(req, res) { res.render('prices'); });
 };

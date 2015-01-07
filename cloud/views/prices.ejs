@@ -3,31 +3,60 @@
 <head>
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
+    <% include include/semantic-header.ejs %>
     <% include include/cienegacss.ejs %>
-    <title>Price List</title>
+
+    <title>Prices</title>
+
 </head>
 <body>
-    <div id='menu'></div>
+    <div class="ui fixed large teal main menu"></div>
 
-    <div id='content'>
-        <table summary="Prices of meats">
+    <div class="main content">
+        <table class="ui striped collapsing compact table priceTable" summary="Prices of meats">
             <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Price</th></tr></thead></thead>
-            <tbody>
-                <% var prev_species='', prev_cat = '';
-                prices.forEach(function(price) { %>
-                <tr<% if(price.get('available') == 0) { %> class='soldout'<% } %>>
-                <td><% if(price.get('species') != prev_species) { prev_species = price.get('species') %><%= prev_species %><% } %></td>
-                <td><% if(price.get('category') != prev_cat) { prev_cat = price.get('category') %><%= prev_cat === undefined ? '' : prev_cat %><% } %></td>
-                <td><%= price.get('cut') %></td>
-                <td><span style='float:left;'>$</span> <span class='aligndecimals'><%= price.get('price').toFixed(2) %></span></td>
-            </tr>
-            <% }) %>
-        </tbody>
-    </table>
-</div>
+        </table>
+    </div>
 
-<% include include/jquery-scripts.ejs %>
-<% include include/parse-scripts.ejs %>
+    <% include include/jquery-scripts.ejs %>
+    <% include include/parse-scripts.ejs %>
+    <% include include/semantic-scripts.ejs %>
+
+    <script>
+    function makePrice(price)
+    {
+        $('.priceTable').append(
+            $('<tr>').append(
+                $('<td>').text(price.get('species')),
+                $('<td>').text(price.get('category')),
+                $('<td>').text(price.get('cut')),
+                $('<td>').text(price.get('price').toFixed(2))
+                )
+            );
+    }
+
+    $(function ()
+    {
+        var priceQuery = new Parse.Query('Prices')
+            .ascending('-species,category,cut');
+
+        var prices = priceQuery.collection();
+
+        prices.fetch({
+            success: function(prices)
+            {
+                prices.forEach(function(price)
+                {
+                    makePrice(price);
+                });
+            },
+            error: function(err)
+            {
+                $('.main.content').text('There was an error fetching data');
+            }
+        });
+    });
+    </script>
 
 </body>
 </html>
