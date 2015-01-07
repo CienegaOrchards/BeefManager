@@ -202,7 +202,7 @@
             },
             error: function(err)
             {
-                res.json(500, err);
+                $('.main.content').text('There was an error fetching data');
             }
         });
 
