@@ -106,7 +106,7 @@
         var slaughterDate = animal === undefined ? null : animal.get('slaughtered');
 
         var locationStr = freezer === undefined || freezer === null ? meat.get('location') : freezer.get('location');
-        var freezerStr = freezer.get('identifier');
+        var freezerStr = freezer === undefined || freezer === null ? 'N/A' : freezer.get('identifier');
 
         var meatPriceStr = (quantity * pricePerUnit).toFixed(2)
         var meatDescStr = quantityStr + unitStr + " " + speciesStr + " " + cutStr;
@@ -146,11 +146,12 @@
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(wf, s);
 
-
         var meatQuery = new Parse.Query('Meat')
+            .exists('freezer')
             .include('cut')
             .include('freezer')
-            .include('animal');
+            .include('animal')
+            .limit(1000);
 
         // Parse.Query.ascending(xyz) won't let you sort by sub-object fields like cut.species,
         // so we form a collection and sort using a comparator
