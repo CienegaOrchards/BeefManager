@@ -16,7 +16,7 @@
         <div class="ui compact raised segment">
             <a class="ui top attached massive label">Prices</a>
             <div class="content">
-                <table class="ui striped teal large table priceTable" summary="Prices of meats"></table>
+                <table class="ui striped large table priceTable" summary="Prices of meats"></table>
             </div>
         </div>
     </div>
@@ -82,13 +82,14 @@
             columnDefs: [
                 { targets: 0, width: '5em', title: 'Species', orderData: [ 0, 1, 2 ]  },
                 { targets: 1, width: '6em', title: 'Category', orderData: [ 0, 1, 2 ] },
-                { targets: 2, width: '10em', title: 'Cut', orderData: [ 0, 1, 2 ] },
-                { targets: 3, width: '4em', title: 'Price', type: 'num' },
-                { targets: 4, width: '2em', title: 'Unit' }
+                { targets: 2, width: '14em', title: 'Cut', orderData: [ 0, 1, 2 ] },
+                { targets: 3, width: '4em', title: 'Price', type: 'num-fmt' },
+                { targets: 4, width: '2em', title: 'Unit', orderable: false }
             ],
             order: [[0,'asc'], [1,'asc'], [2,'asc']],
             paging: false,
-            dom: headerFooterFormat + 'rt' + headerFooterFormat
+            dom: headerFooterFormat + 'rt' + headerFooterFormat,
+            scrollY: '40em'
         });
 
         $('.addbutton')

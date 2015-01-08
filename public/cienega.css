@@ -75,3 +75,9 @@ body
     float: none;
     text-align: left;
 }
+
+.dataTables_scroll
+{
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
