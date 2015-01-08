@@ -69,3 +69,14 @@ body
     width: 2in;
     height: 2in;
 }
+
+.addbutton
+{
+    float: left;
+    margin-bottom: 1em;
+}
+
+.dataTables_filter
+{
+    padding-bottom: 1em;
+}

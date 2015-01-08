@@ -13,9 +13,20 @@
     <div class="ui fixed large teal main menu"></div>
 
     <div class="main content">
-        <table class="ui striped collapsing compact teal table priceTable" summary="Prices of meats">
-            <thead><tr><th>Species</th><th>Category</th><th>Cut</th><th>Price</th><th>Unit</th></tr></thead></thead>
+        <table class="ui collapsing striped teal large table priceTable" summary="Prices of meats">
         </table>
+    </div>
+
+    <div class="ui modal errors">
+        <div class="content">
+            <div class="image">
+                <i class="red warning circle icon"></i>
+            </div>
+            <div class="description"><div class="ui header">Error</div><p class="message"></p></div>
+        </div>
+        <div class="actions">
+            <div class="ui button">OK</div>
+        </div>
     </div>
 
     <% include include/jquery-scripts.ejs %>
@@ -23,23 +34,68 @@
     <% include include/semantic-scripts.ejs %>
 
     <script>
-    function makePrice(price)
+    var priceTable;
+
+    function editPrice(newPrice, settings)
     {
-        $('.priceTable').append(
-            $('<tr>').append(
-                $('<td>').text(price.get('species')),
-                $('<td>').text(price.get('category')),
-                $('<td>').text(price.get('cut')),
-                $('<td>').addClass('right aligned').text('$' + price.get('price').toFixed(2)),
-                $('<td>').text('/' + price.get('units'))
-                )
-            );
+        var theCell = this;
+        var priceObj = $( this.parentNode ).data('parsePrice');
+        var oldPrice = priceObj.get('price');
+        var priceNum = parseFloat(newPrice);
+        if(isNaN(priceNum))
+        {
+            priceNum = priceObj.get('price');
+        }
+        else
+        {
+            $('.primary.button').addClass('loading');
+            priceObj.save( { price: priceNum },
+            {
+                success: function(price)
+                {
+                    $('.primary.button').removeClass('loading');
+                },
+                error: function(price, err)
+                {
+                    $('.modal.errors .message').text(err.message);
+                    $('.modal.errors').modal('show');
+
+                    priceTable.cell(theCell).data(oldPrice.toFixed(2));
+                    $('.primary.button').removeClass('loading');
+                }
+            } );
+        }
+
+        return '$ ' + priceNum.toFixed(2);
     }
 
     $(function ()
     {
-        var priceQuery = new Parse.Query('Prices')
-            .ascending('-species,category,cut');
+        // Init DataTables
+        priceTable = $('.priceTable').DataTable({
+            autoWidth: false,
+            columnDefs: [
+                { targets: 0, title: 'Species', orderData: [ 0, 1, 2 ]  },
+                { targets: 1, title: 'Category', orderData: [ 0, 1, 2 ] },
+                { targets: 2, title: 'Cut', orderData: [ 0, 1, 2 ] },
+                { targets: 3, title: 'Price', type: 'num' },
+                { targets: 4, title: 'Unit' }
+            ],
+            order: [[0,'asc'], [1,'asc'], [2,'asc']],
+            paging: false,
+            dom: '<"ui compact segment"<"addbutton">f<"clearing">rt<"addbutton">f<"clearing">>'
+        });
+
+        $('.addbutton')
+            .addClass('ui primary labeled icon button')
+            .text('Add')
+            .prepend($('<i>').addClass('plus icon'))
+            .click(function()
+            {
+
+            });
+
+        var priceQuery = new Parse.Query('Prices');
 
         var prices = priceQuery.collection();
 
@@ -48,12 +104,33 @@
             {
                 prices.forEach(function(price)
                 {
-                    makePrice(price);
+                    var newRow = priceTable.row.add([
+                            price.get('species'),
+                            price.get('category'),
+                            price.get('cut'),
+                            '$ ' + price.get('price').toFixed(2),
+                            '/' + price.get('units')
+                        ]).node();
+
+                    $(newRow).data('parsePrice', price);
+               });
+
+                 // Apply the jEditable handlers to the table
+                priceTable.column(3).nodes().to$().editable(editPrice,
+                {
+                    // Remove '$ and any ,'
+                    data: function(value, settings) { return value.replace(/[$, ]/g, ''); }
                 });
+
+                // Make prices right-align
+                priceTable.column(3).nodes().to$().addClass('right aligned');
+
+                priceTable.draw();
             },
             error: function(err)
             {
-                $('.main.content').text('There was an error fetching data');
+                $('.modal.errors .message').text(err.message);
+                $('.modal.errors').modal('show');
             }
         });
     });
