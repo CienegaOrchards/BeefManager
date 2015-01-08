@@ -18,6 +18,9 @@
             <div class="content">
                 <table class="ui striped large table priceTable" summary="Prices of meats"></table>
             </div>
+            <div id="pricedimmer" class="ui inverted dimmer">
+                <div class="ui large text loader">Loading price data</div>
+            </div>
         </div>
     </div>
 
@@ -75,6 +78,8 @@
 
     $(function ()
     {
+        $('#pricedimmer').dimmer('show');
+
         var headerFooterFormat = '<"ui two column centered grid"<"left aligned column"f><"right aligned column"<"addbutton">>>';
         // Init DataTables
         priceTable = $('.priceTable').DataTable({
@@ -132,11 +137,13 @@
                 priceTable.column(3).nodes().to$().addClass('right aligned');
 
                 priceTable.draw();
+                $('#pricedimmer').dimmer('hide');
             },
             error: function(err)
             {
                 $('.modal.errors .message').text(err.message);
                 $('.modal.errors').modal('show');
+                $('#pricedimmer').dimmer('hide');
             }
         });
     });

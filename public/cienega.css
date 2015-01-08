@@ -81,3 +81,8 @@ body
     margin-top: 1em;
     margin-bottom: 1em;
 }
+
+table.dataTable thead .sorting_disabled
+{
+    background: white;
+}
