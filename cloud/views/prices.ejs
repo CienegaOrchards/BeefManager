@@ -13,8 +13,12 @@
     <div class="ui fixed large teal main menu"></div>
 
     <div class="main content">
-        <table class="ui collapsing striped teal large table priceTable" summary="Prices of meats">
-        </table>
+        <div class="ui compact raised segment">
+            <a class="ui top attached massive label">Prices</a>
+            <div class="content">
+                <table class="ui striped teal large table priceTable" summary="Prices of meats"></table>
+            </div>
+        </div>
     </div>
 
     <div class="ui modal errors">
@@ -71,19 +75,20 @@
 
     $(function ()
     {
+        var headerFooterFormat = '<"ui two column centered grid"<"left aligned column"f><"right aligned column"<"addbutton">>>';
         // Init DataTables
         priceTable = $('.priceTable').DataTable({
             autoWidth: false,
             columnDefs: [
-                { targets: 0, title: 'Species', orderData: [ 0, 1, 2 ]  },
-                { targets: 1, title: 'Category', orderData: [ 0, 1, 2 ] },
-                { targets: 2, title: 'Cut', orderData: [ 0, 1, 2 ] },
-                { targets: 3, title: 'Price', type: 'num' },
-                { targets: 4, title: 'Unit' }
+                { targets: 0, width: '5em', title: 'Species', orderData: [ 0, 1, 2 ]  },
+                { targets: 1, width: '6em', title: 'Category', orderData: [ 0, 1, 2 ] },
+                { targets: 2, width: '10em', title: 'Cut', orderData: [ 0, 1, 2 ] },
+                { targets: 3, width: '4em', title: 'Price', type: 'num' },
+                { targets: 4, width: '2em', title: 'Unit' }
             ],
             order: [[0,'asc'], [1,'asc'], [2,'asc']],
             paging: false,
-            dom: '<"ui compact segment"<"addbutton">f<"clearing">rt<"addbutton">f<"clearing">>'
+            dom: headerFooterFormat + 'rt' + headerFooterFormat
         });
 
         $('.addbutton')

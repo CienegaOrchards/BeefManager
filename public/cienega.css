@@ -70,13 +70,8 @@ body
     height: 2in;
 }
 
-.addbutton
+.column .dataTables_filter
 {
-    float: left;
-    margin-bottom: 1em;
-}
-
-.dataTables_filter
-{
-    padding-bottom: 1em;
+    float: none;
+    text-align: left;
 }
