@@ -50,11 +50,12 @@
         var existing = $('.ui.segment.species_'+speciesLabel);
         if(!existing || existing.size() == 0)
         {
-            existing =
-            $('<div>').addClass('ui raised segment species_'+speciesLabel)
-            .append($('<a>', {text: speciesStr}).addClass('ui top attached massive label'));
+            existing = $('<div>').addClass('ui raised attached segment species_'+speciesLabel);
 
-            $('.main.content').append(existing);
+            $('.main.content').append(
+                    $('<h1>', {text: speciesStr}).addClass('ui top attached block header'),
+                    existing
+            );
         }
 
         return existing;
@@ -74,8 +75,10 @@
         {
             existing = $('<div>').addClass('ui cards category_'+categoryLabel);
 
-            species.append($('<a>', {text: categoryStr}).addClass('ui big teal ribbon label'));
-            species.append(existing);
+            species.append(
+                $('<h2>', {text: categoryStr}).addClass('ui huge teal ribbon label'),
+                existing
+            );
         }
 
         return existing;
