@@ -1,30 +1,3 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
 <script src="//cdn.jsdelivr.net/jquery.jeditable/1.7.3/jquery.jeditable.js"></script>
-
-<script>
-
-var alignDecimals = function(i,e)
-{
-    var wholePart, fractionPart;
-    var parts = $(e).text().split('.');
-    wholePart = parts.shift();
-    fractionPart = parts.shift();
-    var html = '<span style="float:left;text-align:right;width:3em;">' + wholePart + '.</span>';
-    html += '<span style="text-align:left;">' + fractionPart + '</span>';
-    $(e).html(html);
-}
-
-
-var colorizeLocation = function(i,e)
-{
-    if($(e).text() == 'Mt Vernon')
-    {
-        $(e).addClass('mtvernon');
-    }
-    else if($(e).text() == 'Cienega Barn')
-    {
-        $(e).addClass('cienegabarn');
-    }
-}
-</script>
