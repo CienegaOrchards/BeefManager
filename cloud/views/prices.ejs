@@ -198,21 +198,20 @@
 
         $('#pricedimmer').dimmer('show');
 
-        var headerFooterFormat = '<"ui two column centered grid"<"left aligned column"f><"right aligned column"<"addbutton">>>';
+        var headerFooterFormat = '<"ui two column grid"<"left aligned column"f><"right aligned column"<"addbutton">>>';
         // Init DataTables
         priceTable = $('.priceTable').DataTable({
             autoWidth: false,
             columnDefs: [
-                { targets: 0, width: '5em', title: 'Species', orderData: [ 0, 1, 2 ]  },
-                { targets: 1, width: '6em', title: 'Category', orderData: [ 0, 1, 2 ] },
-                { targets: 2, width: '14em', title: 'Cut', orderData: [ 0, 1, 2 ] },
-                { targets: 3, width: '4em', title: 'Price', type: 'num-fmt' },
-                { targets: 4, width: '2em', title: 'Unit', orderable: false }
+                { targets: 0, title: 'Species', orderData: [ 0, 1, 2 ]  },
+                { targets: 1, title: 'Category', orderData: [ 0, 1, 2 ] },
+                { targets: 2, title: 'Cut', orderData: [ 0, 1, 2 ] },
+                { targets: 3, title: 'Price', type: 'num-fmt' },
+                { targets: 4, title: 'Unit', orderable: false }
             ],
             order: [[0,'asc'], [1,'asc'], [2,'asc']],
             paging: false,
             dom: headerFooterFormat + 'rt' + headerFooterFormat,
-            scrollY: '40em'
         });
 
         $('.addbutton')
