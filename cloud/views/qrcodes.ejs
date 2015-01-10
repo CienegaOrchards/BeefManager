@@ -3,7 +3,6 @@
 <head>
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
-    <% include include/alertify-header.ejs %>
     <% include include/cienegacss.ejs %>
     <% var moment = require('moment'); %>
     <title>QR Codes</title>
@@ -23,21 +22,13 @@
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
     <% include include/qrcode-scripts.ejs %>
-    <% include include/alertify-scripts.ejs %>
 
     <script type="text/javascript">
     $(function() {
-        alertify.alert('Loading Fonts', 'Please wait...')
-            .set('movable',false)
-            .set('modal', true)
-            .set('closable', false)
-            .set('maximizable', false)
-            .set('pinnable', false);
-
         var fonts = $.Deferred();
         WebFontConfig = {
             google: { families: [ 'Amatic+SC:700:latin' ] },
-            active: function() { alertify.closeAll(); fonts.resolve(); }
+            active: function() { fonts.resolve(); }
         };
 
         var wf = document.createElement('script');
@@ -49,13 +40,6 @@
 
         fonts.done(function()
                     {
-                        alertify.alert('Generating QR codes', 'Please wait...')
-                            .set('movable',false)
-                            .set('modal', true)
-                            .set('closable', false)
-                            .set('maximizable', false)
-                            .set('pinnable', false);
-
                         $(".qrcode").each(function() {
                             $(this).qrcode({
                                 size: 600, // 600 DPI
@@ -78,8 +62,6 @@
                                 label: $(this).attr('desc')
                             });
                         });
-
-                        alertify.closeAll();
                     });
     });
     </script>
