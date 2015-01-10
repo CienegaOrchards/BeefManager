@@ -3,9 +3,7 @@
 <head>
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
-    <% include include/alertify-header.ejs %>
-    <% include include/idealforms-header.ejs %>
-    <% include include/cienegacss.ejs %>
+    <% include include/semantic-header.ejs %>
     <% var moment = require('moment'); %>
     <title>Bulk Entry</title>
 </head>
@@ -61,8 +59,6 @@
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
     <% include include/qrcode-scripts.ejs %>
-    <% include include/alertify-scripts.ejs %>
-    <% include include/idealforms-scripts.ejs %>
 
     <script>
     $('form.idealforms').idealforms({

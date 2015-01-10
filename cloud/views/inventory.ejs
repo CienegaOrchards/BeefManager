@@ -4,7 +4,6 @@
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
     <% include include/semantic-header.ejs %>
-    <% include include/cienegacss.ejs %>
 
     <title>Inventory</title>
 
@@ -53,10 +52,7 @@
         {
             existing =
             $('<div>').addClass('ui raised segment species_'+speciesLabel)
-            .append(
-                $('<a>', {text: speciesStr}).addClass('ui top attached massive label'),
-                $('<div>').addClass('content')
-                );
+            .append($('<a>', {text: speciesStr}).addClass('ui top attached massive label'));
 
             $('.main.content').append(existing);
         }
