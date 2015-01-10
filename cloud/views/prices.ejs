@@ -151,6 +151,45 @@
         return '$ ' + priceNum.toFixed(2);
     }
 
+    function hideAdminStuff()
+    {
+        $('.addbutton').hide();
+
+         // Remove the jEditable handlers to the table
+        priceTable.column(3).nodes().to$().editable('disable');
+    }
+
+    function showAdminStuff()
+    {
+        $('.addbutton').show();
+
+        priceTable.column(3).nodes().to$().editable('enable');
+    }
+
+    function checkAdmin()
+    {
+        if(!(Parse.User.current() && Parse.User.current().authenticated()))
+        {
+            hideAdminStuff();
+            return;
+        }
+
+        var query = (new Parse.Query(Parse.Role))
+            .equalTo("name", "admin")
+            .equalTo("users", Parse.User.current())
+            .first()
+            .then(function(adminRole)
+            {
+                if (adminRole)
+                {
+                    showAdminStuff();
+                } else {
+                    hideAdminStuff();
+                }
+            });
+    }
+    postLoginChange = checkAdmin;
+
     $(function ()
     {
         $('.form.newitemprice').form({
@@ -402,6 +441,9 @@
                 priceTable.column(3).nodes().to$().addClass('right aligned');
 
                 priceTable.draw();
+
+                checkAdmin();
+
                 $('#pricedimmer').dimmer('hide');
             },
             error: function(err)
