@@ -36,12 +36,87 @@
         </div>
     </div>
 
+    <div class="ui modal newprice">
+        <div class="content">
+            <div class="image">
+                <i class="money icon"></i>
+            </div>
+            <div class="description">
+                <div class="ui form newitemprice"><form>
+                    <h4 class="ui dividing header">Enter new item details</h4>
+                    <div class="field">
+                        <div class="three fields">
+                            <div class="required field">
+                                <label>Species</label>
+                                <div class="ui fluid search selection dropdown speciesname">
+                                    <input id="speciesname" type="hidden"></input>
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Enter Species...</div>
+                                    <div class="menu"></div>
+                                </div>
+                            </div>
+                            <div class="required field">
+                                <label>Category</label>
+                                <div class="ui fluid search selection dropdown categoryname">
+                                    <input id="categoryname" type="hidden"></input>
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Enter Category...</div>
+                                    <div class="menu"></div>
+                                </div>
+                            </div>
+                            <div class="required field">
+                                <label>Cut</label>
+                                <div class="ui icon input">
+                                    <i class="cut icon"></i>
+                                    <input type="text" id="cutname" placeholder="Cut">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="two fields">
+                            <div class="required field">
+                                <label>Price per unit</label>
+                                <div class="ui icon input">
+                                    <i class="money icon"></i>
+                                    <input type="text" id="priceperunit" placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="required field">
+                                <label>Units</label>
+                                <div class="ui fluid search selection dropdown unitname">
+                                    <input id="unitname" type="hidden"></input>
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Enter Units...</div>
+                                    <div class="menu"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form></div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui buttons">
+                <div class="ui negative circular button">
+                    Cancel
+                </div>
+                <div class="or"></div>
+                <div class="ui positive circular button">
+                    Add
+                </div>
+            </div>
+        </div>
+    </div>
+
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
     <% include include/semantic-scripts.ejs %>
 
     <script>
     var priceTable;
+    var SpeciesType = Parse.Object.extend('Species');
+    var PricesType = Parse.Object.extend('Prices');
 
     function editPrice(newPrice, settings)
     {
@@ -78,6 +153,49 @@
 
     $(function ()
     {
+        $('.form.newitemprice').form({
+            speciesname: {
+                identifier: 'speciesname',
+                rules: [ { type: 'notentercheck', prompt: 'Please specify a species' } ]
+            },
+            categoryname: {
+                identifier: 'categoryname',
+                rules: [ { type: 'notentercheck', prompt: 'Please specify a category' } ]
+            },
+            cutname: {
+                identifier: 'cutname',
+                rules: [ { type: 'empty', prompt: 'Please specify a cut name' } ]
+            },
+            priceperunit: {
+                identifier: 'priceperunit',
+                rules: [ { type: 'empty', prompt: 'Please specify a price' },
+                         { type: 'pricecheck', prompt: 'Price must be a reasonable number (1.00 - 99.99)' }
+                       ]
+            },
+            unitname: {
+                identifier: 'unitname',
+                rules: [ { type: 'notentercheck', prompt: 'Please specify a unit' } ]
+            }
+        }, {
+            on: 'blur',
+            inline: true,
+            rules: {
+                pricecheck: function ()
+                {
+                    var numPrice = parseFloat($(this).val());
+                    if(isNaN(numPrice) || numPrice < 1.0 || numPrice > 99.99) return false;
+                    return true;
+                },
+                notentercheck: function()
+                {
+                    var name = $(this).parent().find('.search').val().length
+                                     ? $(this).parent().find('.search').val()
+                                     : $(this).parent().find('.text').text();
+                    return !(/^Enter/).test(name);
+                }
+            }
+        });
+
         $('#pricedimmer').dimmer('show');
 
         var headerFooterFormat = '<"ui two column centered grid"<"left aligned column"f><"right aligned column"<"addbutton">>>';
@@ -103,7 +221,117 @@
             .prepend($('<i>').addClass('plus icon'))
             .click(function()
             {
+                $('.modal.newprice')
+                    .modal({
+                        closable: false,
+                        onDeny: function()
+                        {
+                            $('form').trigger('reset');
+                            $('.form.newitemprice .ui.dropdown').dropdown('restore defaults');
+                            $('.form.newitemprice .ui.dropdown .menu .item.filtered').removeClass('filtered');
+                        },
+                        onApprove: function()
+                        {
+                            if($('.form.newitemprice').form('validate form'))
+                            {
+                                var speciesname = $('#speciesname').parent().find('.search').val().length
+                                                 ? $('#speciesname').parent().find('.search').val()
+                                                 : $('#speciesname').parent().find('.text').text();
+                                var categoryname = $('#categoryname').parent().find('.search').val().length
+                                                 ? $('#categoryname').parent().find('.search').val()
+                                                 : $('#categoryname').parent().find('.text').text();
+                                var unitname = $('#unitname').parent().find('.search').val().length
+                                                 ? $('#unitname').parent().find('.search').val()
+                                                 : $('#unitname').parent().find('.text').text();
 
+                                var newspecies = !$('#speciesname .item[data-value="' + speciesname + '"]').length;
+                                var newcategory = !$('#categoryname .item[data-value="' + categoryname + '"]').length;
+                                var newunit = !$('#unitname .item[data-value="' + unitname + '"]').length;
+
+                                if(newspecies)
+                                {
+                                    var parseSpecies = new SpeciesType();
+                                    parseSpecies.save({ species: speciesname },
+                                        {
+                                            success: function(species)
+                                            {
+                                                $('.ui.dropdown.speciesname .menu')
+                                                    .append($('<div>').addClass('item').attr({ 'data-value': speciesname }).text(speciesname));
+                                                $('.ui.dropdown.speciesname').dropdown();
+                                            }
+                                        });
+                                }
+
+                                if(newcategory)
+                                {
+                                    $('.ui.dropdown.categoryname .menu')
+                                        .append($('<div>').addClass('item').attr({ 'data-value': categoryname }).text(categoryname));
+                                    $('.ui.dropdown.categoryname').dropdown();
+                                }
+
+                                if(newunit)
+                                {
+                                    $('.ui.dropdown.unitname .menu')
+                                        .append($('<div>').addClass('item').attr({ 'data-value': unitname }).text(unitname));
+                                    $('.ui.dropdown.unitname').dropdown();
+                                }
+
+                                $('#pricedimmer').dimmer('show');
+
+                                var parsePrice = new PricesType();
+                                parsePrice.save(
+                                {
+                                    species: speciesname,
+                                    category: categoryname,
+                                    cut: $('input#cutname').val(),
+                                    price: parseFloat($('input#priceperunit').val()),
+                                    units: unitname
+                                },
+                                {
+                                    success: function(price)
+                                    {
+                                        var newRow = priceTable.row.add([
+                                                price.get('species'),
+                                                price.get('category'),
+                                                price.get('cut'),
+                                                '$ ' + price.get('price').toFixed(2),
+                                                '/' + price.get('units')
+                                            ]).node();
+
+                                        $(newRow).data('parsePrice', price);
+
+                                         // Apply the jEditable handlers to the table
+                                        priceTable.column(3).nodes().to$().editable(editPrice,
+                                        {
+                                            // Remove '$ and any ,'
+                                            data: function(value, settings) { return value.replace(/[$, ]/g, ''); }
+                                        });
+
+                                        // Make prices right-align
+                                        priceTable.column(3).nodes().to$().addClass('right aligned');
+
+                                        priceTable.draw();
+                                        $('#pricedimmer').dimmer('hide');
+                                    },
+                                    error: function(price, err)
+                                    {
+                                        $('.modal.errors .message').text(err.message);
+                                        $('.modal.errors').modal('show');
+                                        $('#pricedimmer').dimmer('hide');
+                                    }
+                                });
+
+                                $('form').trigger('reset');
+                                $('.form.newitemprice .ui.dropdown').dropdown('restore defaults');
+                                $('.form.newitemprice .ui.dropdown .menu .item.filtered').removeClass('filtered');
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                    })
+                    .modal('show');
             });
 
         var priceQuery = new Parse.Query('Prices');
@@ -113,8 +341,16 @@
         prices.fetch({
             success: function(prices)
             {
+                var specieslist = {};
+                var categorylist = {};
+                var unitlist = {};
+
                 prices.forEach(function(price)
                 {
+                    specieslist[price.get('species')] = true;
+                    categorylist[price.get('category')] = true;
+                    unitlist[price.get('units')] = true;
+
                     var newRow = priceTable.row.add([
                             price.get('species'),
                             price.get('category'),
@@ -124,7 +360,37 @@
                         ]).node();
 
                     $(newRow).data('parsePrice', price);
-               });
+                });
+
+                for(var speciesname in specieslist)
+                {
+                    if(specieslist.hasOwnProperty(speciesname))
+                    {
+                        $('.ui.dropdown.speciesname .menu')
+                            .append($('<div>').addClass('item').attr({ 'data-value': speciesname }).text(speciesname));
+                    }
+                }
+                $('.ui.dropdown.speciesname').dropdown('save defaults');
+
+                for(var categoryname in categorylist)
+                {
+                    if(categorylist.hasOwnProperty(categoryname))
+                    {
+                        $('.ui.dropdown.categoryname .menu')
+                            .append($('<div>').addClass('item').attr({ 'data-value': categoryname }).text(categoryname));
+                    }
+                }
+                $('.ui.dropdown.categoryname').dropdown('save defaults');
+
+                for(var unitname in unitlist)
+                {
+                    if(unitlist.hasOwnProperty(unitname))
+                    {
+                        $('.ui.dropdown.unitname .menu')
+                            .append($('<div>').addClass('item').attr({ 'data-value': unitname }).text(unitname));
+                    }
+                }
+                $('.ui.dropdown.unitname').dropdown('save defaults');
 
                  // Apply the jEditable handlers to the table
                 priceTable.column(3).nodes().to$().editable(editPrice,
