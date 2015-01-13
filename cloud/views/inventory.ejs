@@ -53,9 +53,25 @@
             existing = $('<div>').addClass('ui raised attached segment species_'+speciesLabel);
 
             $('.main.content').append(
-                    $('<h1>', {text: speciesStr}).addClass('ui top attached block header'),
+                    $('<h1>').addClass('ui top attached block header').append(
+                            $('<img>').addClass('ui middle aligned left floated tiny image').attr('src','/images/' + speciesLabel.toLowerCase() + '.svg'),
+                            $('<div>').addClass('content').text(speciesStr)
+                        ).css({'min-height':'3.4em'}),
                     existing
             );
+
+            (new Parse.Query('Species'))
+            .equalTo('species',speciesStr)
+            .first(
+            {
+                success: function(species)
+                {
+                    existing.prev('h1').data('species',species);
+                    existing.prev('h1').append(
+                        $('<div>').addClass('sub header').text(species.get('description'))
+                    );
+                }
+            });
         }
 
         return existing;
@@ -70,15 +86,36 @@
         var categoryLabel = categoryStr.replace(/[^a-zA-Z]/g, '_');
 
         var species = makeSpecies(meat);
-        var existing = species.find('.ui.cards.category_'+categoryLabel);
+        var existing = species.find('.ui.cards.category_'+speciesLabel+'__'+categoryLabel);
         if(!existing || existing.size() == 0)
         {
-            existing = $('<div>').addClass('ui cards category_'+categoryLabel);
+            existing = $('<div>').addClass('ui cards category_'+speciesLabel+'__'+categoryLabel);
 
             species.append(
-                $('<h2>', {text: categoryStr}).addClass('ui huge teal ribbon label'),
+                $('<div>').addClass('ui huge teal ribbon label').append(
+                    $('<h3>').addClass('ui header').text(categoryStr).prepend(
+                        $('<i>').addClass('inverted middle aligned angle right icon').css('padding-top','0.2rem')
+                    )
+                ),
                 existing
             );
+
+            (new Parse.Query('Category'))
+            .equalTo('species',speciesStr)
+            .equalTo('category',categoryStr)
+            .first(
+            {
+                success: function(category)
+                {
+                    existing.data('category',category);
+                    existing.before(
+                        $('<div>').addClass('ui basic segment').css('margin-top','1rem').append(
+                            $('<i>').addClass('left floated circular info icon').css('float','left'),
+                            $('<p>').css({'margin-left':'3em','max-width':'50%'}).text(category.get('description'))
+                        )
+                    );
+                }
+            });
         }
 
         return existing;
