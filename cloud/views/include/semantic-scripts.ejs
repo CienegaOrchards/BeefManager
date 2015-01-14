@@ -1,1 +1,10 @@
 <script src="/semantic/semantic.min.js"></script>
+
+<script>
+    $.fn.getSemanticDropdownValue = function()
+    {
+        var parent = this.parent();
+        var search = parent.find('.search').val();
+        return search.length ? search : parent.find('.text').text();
+    }
+</script>

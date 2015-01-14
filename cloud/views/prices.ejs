@@ -226,9 +226,7 @@
                 },
                 notentercheck: function()
                 {
-                    var name = $(this).parent().find('.search').val().length
-                                     ? $(this).parent().find('.search').val()
-                                     : $(this).parent().find('.text').text();
+                    var name = $(this).getSemanticDropdownValue();
                     return !(/^Enter/).test(name);
                 }
             }
@@ -271,19 +269,13 @@
                         {
                             if($('.form.newitemprice').form('validate form'))
                             {
-                                var speciesname = $('#speciesname').parent().find('.search').val().length
-                                                 ? $('#speciesname').parent().find('.search').val()
-                                                 : $('#speciesname').parent().find('.text').text();
-                                var categoryname = $('#categoryname').parent().find('.search').val().length
-                                                 ? $('#categoryname').parent().find('.search').val()
-                                                 : $('#categoryname').parent().find('.text').text();
-                                var unitname = $('#unitname').parent().find('.search').val().length
-                                                 ? $('#unitname').parent().find('.search').val()
-                                                 : $('#unitname').parent().find('.text').text();
+                                var speciesname = $('#speciesname').getSemanticDropdownValue();
+                                var categoryname = $('#categoryname').getSemanticDropdownValue();
+                                var unitname = $('#unitname').getSemanticDropdownValue();
 
-                                var newspecies = !$('#speciesname .item[data-value="' + speciesname + '"]').length;
-                                var newcategory = !$('#categoryname .item[data-value="' + categoryname + '"]').length;
-                                var newunit = !$('#unitname .item[data-value="' + unitname + '"]').length;
+                                var newspecies = !$('.speciesname .item[data-value="' + speciesname + '"]').length;
+                                var newcategory = !$('.categoryname .item[data-value="' + categoryname + '"]').length;
+                                var newunit = !$('.unitname .item[data-value="' + unitname + '"]').length;
 
                                 if(newspecies)
                                 {
