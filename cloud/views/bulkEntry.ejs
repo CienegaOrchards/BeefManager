@@ -357,8 +357,11 @@
                 }
             });
 
-            //$('form').trigger('reset');
-            $('.form.newanimalform .ui.dropdown').dropdown('restore defaults');
+            $('.form.newanimalform #animalID').val('');
+            $('.form.newanimalform #borndate').val('');
+            $('.form.newanimalform #slaughterdate').val('');
+            $('.form.newanimalform #animalID').focus()
+            $('.form.newanimalform .ui.dropdown').dropdown('save defaults');
             $('.form.newanimalform .ui.dropdown .menu .item.filtered').removeClass('filtered');
         });
 
