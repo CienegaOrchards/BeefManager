@@ -4,91 +4,377 @@
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
     <% include include/semantic-header.ejs %>
-    <% var moment = require('moment'); %>
+
     <title>Bulk Entry</title>
+
 </head>
 <body>
-    <div id='menu'></div>
+    <div class="ui fixed large teal main menu"></div>
 
-    <div id='content'>
-        <span id='form'>
-            <div class="idealsteps-container">
-
-                <nav class="idealsteps-nav"></nav>
-
-                <form action='' novalidate autocomplete='off' class='idealforms'>
-
-                    <div class="idealsteps-wrap">
-
-                        <div class="field">
-                            <label class="main">Species:</label>
-                            <select name="species">
-                              <option value="beef">Beef</option>
-                              <option value="chicken">Chicken</option>
-                              <option value="lamb">Lamb</option>
-                              <option value="goat">Goat</option>
-                              <option value="venison">Venison</option>
-                            </select>
-                            <span class="error"></span>
+    <div class="main content">
+        <div class="ui grid">
+            <div class="row">
+                <div class="eight wide column">
+                    <div class="ui raised segment">
+                        <a class="ui top attached massive label">Enter new meat</a>
+                        <div class="content">
+                            <div class="ui form newmeatform">
+                                <div class="fields">
+                                    <div class="four wide required field">
+                                        <label>Species</label>
+                                        <div class="ui fluid search selection dropdown speciesname">
+                                            <input id="speciesname" type="hidden" />
+                                            <i class="dropdown icon"></i>
+                                            <div class="default text">Enter Species...</div>
+                                            <div class="menu"></div>
+                                        </div>
+                                    </div>
+                                    <div class="five wide required field">
+                                        <label>Category</label>
+                                        <div class="ui fluid search selection dropdown categoryname">
+                                            <input id="categoryname" type="hidden" />
+                                            <i class="dropdown icon"></i>
+                                            <div class="default text">Enter Category...</div>
+                                            <div class="menu"></div>
+                                        </div>
+                                    </div>
+                                    <div class="seven wide required field">
+                                        <label>Cut</label>
+                                        <div class="ui fluid search selection dropdown cutname">
+                                            <input id="cutname" type="hidden" />
+                                            <i class="dropdown icon"></i>
+                                            <div class="default text">Enter Cut...</div>
+                                            <div class="menu"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fields">
+                                    <div class="four wide required field">
+                                        <label>Units/Weight</label>
+                                        <input type="text" placeholder="Units" />
+                                    </div>
+                                    <div class="six wide field">
+                                        <label>Animal</label>
+                                        <div class="ui fluid search selection dropdown animalname">
+                                            <input id="animalname" type="hidden"></input>
+                                            <i class="dropdown icon"></i>
+                                            <div class="default text">Animal ID</div>
+                                            <div class="menu"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ui right floated teal submit addmeatbutton button">Add</div>
+                            </div>
                         </div>
-
-
-                        <div class="field">
-                            <label class="main">Cut:</label>
-                            <input name="cut" type="text" data-idealforms-rules="required cut">
-                            <span class="error"></span>
-                        </div>
-
-                        <div class="field buttons">
-                            <button type="submit">Submit</button>
-                        </div>
-
                     </div>
-
-                    <span id="invalid"></span>
-
-                </form>
-
+                </div>
+                <div class="eight wide column">
+                    <div class="ui raised segment">
+                        <a class="ui top attached massive label">Enter new animal</a>
+                        <div class="content">
+                            <div class="ui form newanimalform">
+                                <div class="fields">
+                                    <div class="four wide required field">
+                                        <label>Species</label>
+                                        <div class="ui fluid search selection dropdown speciesname">
+                                            <input id="speciesname" type="hidden"></input>
+                                            <i class="dropdown icon"></i>
+                                            <div class="default text">Enter Species...</div>
+                                            <div class="menu"></div>
+                                        </div>
+                                    </div>
+                                    <div class="six wide required field">
+                                        <label>Identifier</label>
+                                        <input id="animalID" type="text" placeholder="Identifier" />
+                                    </div>
+                                </div>
+                                <div class="fields">
+                                    <div class="four wide field">
+                                        <label>Date born</label>
+                                        <input id="borndate" type="text" placeholder="Born Date" />
+                                    </div>
+                                    <div class="four wide field">
+                                        <label>Date slaughtered</label>
+                                        <input id="slaughterdate" type="text" placeholder="Slaughter Date" />
+                                    </div>
+                                </div>
+                                <div class="ui right floated teal submit addanimalbutton button">Add</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </span>
+            <div class="row">
+                <div class="eight wide column">
+                    <div class="ui segment meatlist">
+                        <a class="ui top attached label">Added meat</a>
+                        <div class="content">
+                            <table class="ui striped large table addedMeatTable" summary="Meats"></table>
+                        </div>
+                    </div>
+                </div>
+                <div class="eight wide column">
+                    <div class="ui segment animallist">
+                        <a class="ui top attached label">Animals</a>
+                        <div class="content">
+                            <table class="ui striped large table animalsTable" summary="Animals"></table>
+                        </div>
+                        <div id="animalsdimmer" class="ui inverted dimmer">
+                            <div class="ui large text loader">Loading animals data</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <span id='rows'>
-        </span>
-     </div>
+    <div class="ui modal errors">
+        <div class="content">
+            <div class="image">
+                <i class="red warning circle icon"></i>
+            </div>
+            <div class="description"><div class="ui header">Error</div><p class="message"></p></div>
+        </div>
+        <div class="actions">
+            <div class="ui primary circular button">OK</div>
+        </div>
+    </div>
+
 
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
-    <% include include/qrcode-scripts.ejs %>
+    <% include include/semantic-scripts.ejs %>
+    <% include include/moment-scripts.ejs %>
 
     <script>
-    $('form.idealforms').idealforms({
+        var priceTable;
+        var SpeciesType = Parse.Object.extend('Species');
+        var CategoryType = Parse.Object.extend('Species');
+        var AnimalType = Parse.Object.extend('Animal');
+        var MeatType = Parse.Object.extend('Meat');
+        var PricesType = Parse.Object.extend('Prices');
 
-        silentLoad: false,
+        var priceQuery = new Parse.Query('Prices');
 
-        rules: {
-            'cut': 'required'
-        },
+        var prices = priceQuery.collection();
 
-        onSubmit: function(invalid, e)
+        prices.fetch({
+            success: function(prices)
+            {
+                var specieslist = {};
+                var categorylist = {};
+                var cutlist = {};
+
+                prices.forEach(function(price)
+                {
+                    specieslist[price.get('species')] = true;
+                    categorylist[price.get('category')] = true;
+                    cutlist[price.get('cut')] = true;
+                });
+
+                for(var speciesname in specieslist)
+                {
+                    if(specieslist.hasOwnProperty(speciesname))
+                    {
+                        $('.ui.dropdown.speciesname .menu')
+                            .append($('<div>').addClass('item').attr({ 'data-value': speciesname }).text(speciesname));
+                    }
+                }
+                $('.ui.dropdown.speciesname').dropdown();
+
+                for(var categoryname in categorylist)
+                {
+                    if(categorylist.hasOwnProperty(categoryname))
+                    {
+                        $('.ui.dropdown.categoryname .menu')
+                            .append($('<div>').addClass('item').attr({ 'data-value': categoryname }).text(categoryname));
+                    }
+                }
+                $('.ui.dropdown.categoryname').dropdown();
+
+                for(var cutname in cutlist)
+                {
+                    if(cutlist.hasOwnProperty(cutname))
+                    {
+                        $('.ui.dropdown.cutname .menu')
+                            .append($('<div>').addClass('item').attr({ 'data-value': cutname }).text(cutname));
+                    }
+                }
+                $('.ui.dropdown.cutname').dropdown();
+            }
+        });
+
+        var headerFooterFormat = '<"ui two column grid"<"left aligned column"f><"right aligned column"<"addbutton">>>';
+        $.fn.dataTable.moment('YYYY/MM/DD');
+
+        $('.form.newanimalform').form({
+            speciesname: {
+                identifier: 'speciesname',
+                rules: [ { type: 'notentercheck', prompt: 'Please specify a species' } ]
+            },
+            animalID: {
+                identifier: 'animalID',
+                rules: [ { type: 'empty', prompt: 'Please specify an ID for the animal' } ]
+            },
+            borndate: {
+                identifier: 'borndate',
+                rules: [ { type: 'datecheck', prompt: 'Born date must be blank or YYYY/MM/DD' } ]
+            },
+            slaughterdate: {
+                identifier: 'slaughterdate',
+                rules: [ { type: 'datecheck', prompt: 'Slaughter date must be blank or YYYY/MM/DD' } ]
+            },
+        }, {
+            on: 'blur',
+            inline: true,
+            rules: {
+                notentercheck: function()
+                {
+                    var name = $(this).getSemanticDropdownValue();
+                    return !(/^Enter/).test(name);
+                },
+                datecheck: function ()
+                {
+                    // Ok to be blank
+                    if($(this).val() == '') return true;
+
+                    // Otherwise has to be valid date
+                    var momentDate = moment($(this).val(), 'YYYY/MM/DD');
+                    if(!momentDate.isValid()) return false;
+
+                    if(momentDate.format('YYYY/MM/DD') == $(this).val()) return true;
+
+                    return false;
+                }
+            }
+        });
+
+
+        var animalsTable = $('.animalsTable').DataTable({
+            autoWidth: false,
+            columnDefs: [
+                { targets: 0, title: 'Species' },
+                { targets: 1, title: 'Identifier' },
+                { targets: 2, title: 'Born' },
+                { targets: 3, title: 'Slaughtered' }
+            ],
+            order: [1, 'asc'],
+            paging: false,
+            dom: headerFooterFormat + 'rt' + headerFooterFormat,
+        });
+
+        var animalQuery = new Parse.Query('Animal');
+        var animals = animalQuery.collection();
+
+        animals.fetch(
         {
-            e.preventDefault();
-            if(invalid)
+            success: function(animals)
             {
-                $('#invalid')
-                    .show()
-                    .toggleClass('valid', ! invalid)
-                    .text(invalid ? (invalid +' invalid fields') : 'All good!');
-            }
-            else
-            {
-                // do something with valid form
-            }
-        }
-    });
+                animals.forEach(function(animal)
+                {
+                    var animalname = animal.get('identifier');
 
-    $('form.idealforms').find('input, select, textarea').on('change keyup', function() {
-      $('#invalid').hide();
-    });
+                    var newRow = animalsTable.row.add([
+                        animal.get('species'),
+                        animalname,
+                        moment(animal.get('born')).format('YYYY/MM/DD'),
+                        moment(animal.get('slaughtered')).format('YYYY/MM/DD')
+                    ]);
+
+                    $(newRow).data('animal',animal);
+
+                    $('.ui.dropdown.animalname .menu').append(
+                        $('<div>').addClass('item').attr({ 'data-value': animalname }).text(animalname)
+                    );
+                });
+
+                $('.ui.dropdown.animalname').dropdown();
+                animalsTable.draw();
+            }
+        });
+
+        $('.addanimalbutton').click(function()
+        {
+            var speciesname = $('.form.newanimalform #speciesname').getSemanticDropdownValue();
+            var animalID = $('.form.newanimalform #animalID').val();
+            var borndate = $('.form.newanimalform #borndate').val();
+            borndate = (borndate == '' ? null : moment(borndate,'YYYY/MM/DD').toDate());
+            var slaughterdate = $('.form.newanimalform #slaughterdate').val();
+            slaughterdate = (slaughterdate == '' ? null : moment(slaughterdate,'YYYY/MM/DD').toDate());
+
+            var newspecies = !$('.form.newanimalform .speciesname .item[data-value="' + speciesname + '"]').length;
+            console.log('New species ('+speciesname+')?: '+newspecies);
+            if(newspecies)
+            {
+                var parseSpecies = new SpeciesType();
+                parseSpecies.save({ species: speciesname },
+                    {
+                        success: function(species)
+                        {
+                            console.log('making new species');
+                            $('.ui.dropdown.speciesname .menu')
+                                .append($('<div>').addClass('item').attr({ 'data-value': speciesname }).text(speciesname));
+                            $('.ui.dropdown.speciesname').dropdown();
+                            console.log('made');
+                        }
+                    });
+            }
+
+            var parseAnimal = new AnimalType();
+            parseAnimal.save(
+            {
+                species: speciesname,
+                identifier: animalID,
+                born: borndate,
+                slaughtered: slaughterdate
+            },
+            {
+                success: function(animal)
+                {
+                    console.log('making new animal');
+                    var animalname = animal.get('identifier');
+
+                    var newRow = animalsTable.row.add([
+                        animal.get('species'),
+                        animalname,
+                        moment(animal.get('born')).format('YYYY/MM/DD'),
+                        moment(animal.get('slaughtered')).format('YYYY/MM/DD')
+                    ]);
+
+                    $(newRow).data('animal',animal);
+
+                    $('.ui.dropdown.animalname .menu').append(
+                        $('<div>').addClass('item').attr({ 'data-value': animalname }).text(animalname)
+                    );
+
+                    $('.ui.dropdown.animalname').dropdown();
+                    animalsTable.draw();
+                },
+                error: function(animal, err)
+                {
+                    $('.modal.errors .message').text(err.message);
+                    $('.modal.errors').modal('show');
+                }
+            });
+
+            //$('form').trigger('reset');
+            $('.form.newanimalform .ui.dropdown').dropdown('restore defaults');
+            $('.form.newanimalform .ui.dropdown .menu .item.filtered').removeClass('filtered');
+        });
+
+        var addedMeatTable = $('.addedMeatTable').DataTable({
+            autoWidth: false,
+            columnDefs: [
+                { targets: 0, title: 'Species',     width: '4em' },
+                { targets: 1, title: 'Category',  width: '6em' },
+                { targets: 2, title: 'Cut',        width: '4em' },
+                { targets: 3, title: 'Units/Weight', width: '4em' },
+                { targets: 4, title: 'Animal', width: '4em' }
+            ],
+            order: [1, 'asc'],
+            paging: false,
+            dom: 'rt',
+        });
 
     </script>
 

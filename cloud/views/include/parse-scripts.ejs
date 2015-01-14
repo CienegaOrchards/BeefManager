@@ -15,47 +15,34 @@ var doMenu = function()
     $('.main.menu').empty();
     menu.forEach(function(item)
     {
-        var menuItem = $('<a></a>',
+        var menuItem = $('<a>',
         {
             text: item.title,
             href: item.link
         }).addClass('item')
-        .prepend($('<i></i>').addClass(item.icon).addClass('large icon'))
+        .prepend($('<i>').addClass(item.icon).addClass('large icon'))
         .appendTo('.main.menu');
-
-        if(item.link == location.pathname)
-        {
-            menuItem.addClass('active');
-        }
     });
 
     var logInOrOutDetails;
     if(Parse.User.current())
     {
-        logInOrOutDetails = {
-            text: 'Logout (' + Parse.User.current().get('realname') + ')',
-            link: '#',
-            icon: 'ban',
-            fn: logOut
-        }
+        $('<a>', { text: 'Entry', href: '/bulkEntry' }).addClass('item').prepend(
+            $('<i>').addClass('large write icon')
+        ).appendTo('.main.menu');
+
+        $('<a>', { text: 'Logout (' + Parse.User.current().get('realname') + ')' }).addClass('right item').prepend(
+            $('<i>').addClass('large ban icon')
+        ).appendTo('.main.menu').click(logOut);
     }
     else
     {
-        logInOrOutDetails = {
-            text: 'Login',
-            link: '#',
-            icon: 'user',
-            fn: logIn
-        }
+        $('<a>', { text: 'Login' }).addClass('right item').prepend(
+            $('<i>').addClass('large user icon')
+        ).appendTo('.main.menu').click(logIn);
     }
 
-    $('<a></a>',
-        {
-            text: logInOrOutDetails.text,
-            href: logInOrOutDetails.link
-        }).addClass('right item')
-        .prepend($('<i></i>').addClass(logInOrOutDetails.icon).addClass('large icon'))
-        .appendTo('.main.menu').click(logInOrOutDetails.fn);
+    $('.main.menu .item[href="'+location.pathname+'"]').addClass('active');
 }
 
 logIn = function()
