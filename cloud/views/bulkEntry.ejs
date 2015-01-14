@@ -205,7 +205,7 @@
         });
 
         var headerFooterFormat = '<"ui two column grid"<"left aligned column"f><"right aligned column"<"addbutton">>>';
-        $.fn.dataTable.moment('YYYY/MM/DD');
+        $.fn.dataTable.moment('YYYY-MM-DD');
 
         $('.form.newanimalform').form({
             speciesname: {
@@ -218,11 +218,11 @@
             },
             borndate: {
                 identifier: 'borndate',
-                rules: [ { type: 'datecheck', prompt: 'Born date must be blank or YYYY/MM/DD' } ]
+                rules: [ { type: 'datecheck', prompt: 'Born date must be blank or YYYY-MM-DD' } ]
             },
             slaughterdate: {
                 identifier: 'slaughterdate',
-                rules: [ { type: 'datecheck', prompt: 'Slaughter date must be blank or YYYY/MM/DD' } ]
+                rules: [ { type: 'datecheck', prompt: 'Slaughter date must be blank or YYYY-MM-DD' } ]
             },
         }, {
             on: 'blur',
@@ -239,10 +239,10 @@
                     if($(this).val() == '') return true;
 
                     // Otherwise has to be valid date
-                    var momentDate = moment($(this).val(), 'YYYY/MM/DD');
+                    var momentDate = moment($(this).val(), 'YYYY-MM-DD');
                     if(!momentDate.isValid()) return false;
 
-                    if(momentDate.format('YYYY/MM/DD') == $(this).val()) return true;
+                    if(momentDate.format('YYYY-MM-DD') == $(this).val()) return true;
 
                     return false;
                 }
@@ -258,9 +258,9 @@
                 { targets: 2, title: 'Born' },
                 { targets: 3, title: 'Slaughtered' }
             ],
-            order: [1, 'asc'],
+            order: [3, 'desc'],
             paging: false,
-            dom: headerFooterFormat + 'rt' + headerFooterFormat,
+            dom: headerFooterFormat + 'rt',
         });
 
         var animalQuery = new Parse.Query('Animal');
@@ -277,8 +277,8 @@
                     var newRow = animalsTable.row.add([
                         animal.get('species'),
                         animalname,
-                        moment(animal.get('born')).format('YYYY/MM/DD'),
-                        moment(animal.get('slaughtered')).format('YYYY/MM/DD')
+                        moment(animal.get('born')).format('YYYY-MM-DD'),
+                        moment(animal.get('slaughtered')).format('YYYY-MM-DD')
                     ]);
 
                     $(newRow).data('animal',animal);
@@ -298,9 +298,9 @@
             var speciesname = $('.form.newanimalform #speciesname').getSemanticDropdownValue();
             var animalID = $('.form.newanimalform #animalID').val();
             var borndate = $('.form.newanimalform #borndate').val();
-            borndate = (borndate == '' ? null : moment(borndate,'YYYY/MM/DD').toDate());
+            borndate = (borndate == '' ? null : moment(borndate,'YYYY-MM-DD').toDate());
             var slaughterdate = $('.form.newanimalform #slaughterdate').val();
-            slaughterdate = (slaughterdate == '' ? null : moment(slaughterdate,'YYYY/MM/DD').toDate());
+            slaughterdate = (slaughterdate == '' ? null : moment(slaughterdate,'YYYY-MM-DD').toDate());
 
             var newspecies = !$('.form.newanimalform .speciesname .item[data-value="' + speciesname + '"]').length;
             console.log('New species ('+speciesname+')?: '+newspecies);
@@ -337,8 +337,8 @@
                     var newRow = animalsTable.row.add([
                         animal.get('species'),
                         animalname,
-                        moment(animal.get('born')).format('YYYY/MM/DD'),
-                        moment(animal.get('slaughtered')).format('YYYY/MM/DD')
+                        moment(animal.get('born')).format('YYYY-MM-DD'),
+                        moment(animal.get('slaughtered')).format('YYYY-MM-DD')
                     ]);
 
                     $(newRow).data('animal',animal);
