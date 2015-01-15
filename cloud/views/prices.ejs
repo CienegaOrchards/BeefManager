@@ -114,8 +114,9 @@
 
     <script>
     var priceTable;
-    var SpeciesType = Parse.Object.extend('Species');
-    var PricesType = Parse.Object.extend('Prices');
+    var SpeciesType  = Parse.Object.extend('Species');
+    var CategoryType = Parse.Object.extend('Category');
+    var PricesType   = Parse.Object.extend('Prices');
 
     function editPrice(newPrice, settings)
     {
@@ -280,7 +281,7 @@
                                 if(newspecies)
                                 {
                                     var parseSpecies = new SpeciesType();
-                                    parseSpecies.save({ species: speciesname },
+                                    parseSpecies.save({ species: speciesname, description: '' },
                                         {
                                             success: function(species)
                                             {
@@ -291,12 +292,28 @@
                                         });
                                 }
 
-                                if(newcategory)
+                                (new Parse.Query('Category')).equalTo('species', speciesname).equalTo('category', categoryname).first().then(
+                                function(category)
                                 {
-                                    $('.ui.dropdown.categoryname .menu')
+                                    if(category)
+                                    {
+                                        return Parse.Promise.as(category);
+                                    }
+                                    else
+                                    {
+                                        return (new CategoryType()).save({ species: speciesname, category: categoryname, description: '' });
+                                    }
+                                }).then(
+                                function(category)
+                                {
+                                    if(newcategory)
+                                    {
+                                        $('.ui.dropdown.categoryname .menu')
                                         .append($('<div>').addClass('item').attr({ 'data-value': categoryname }).text(categoryname));
-                                    $('.ui.dropdown.categoryname').dropdown();
-                                }
+                                        $('.ui.dropdown.categoryname').dropdown();
+                                    }
+                                    return Parse.Promise.as('ok');
+                                });
 
                                 if(newunit)
                                 {
