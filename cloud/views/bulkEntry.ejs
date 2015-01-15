@@ -51,12 +51,12 @@
                                 <div class="fields">
                                     <div class="four wide required field">
                                         <label>Units/Weight</label>
-                                        <input type="text" placeholder="Units" />
+                                        <input id="units" type="text" placeholder="Units" />
                                     </div>
                                     <div class="six wide field">
                                         <label>Animal</label>
-                                        <div class="ui fluid search selection dropdown animalname">
-                                            <input id="animalname" type="hidden"></input>
+                                        <div class="ui fluid search selection dropdown animalID">
+                                            <input id="animalID" type="hidden"></input>
                                             <i class="dropdown icon"></i>
                                             <div class="default text">Animal ID</div>
                                             <div class="menu"></div>
@@ -148,11 +148,11 @@
 
     <script>
         var priceTable;
-        var SpeciesType = Parse.Object.extend('Species');
-        var CategoryType = Parse.Object.extend('Species');
-        var AnimalType = Parse.Object.extend('Animal');
-        var MeatType = Parse.Object.extend('Meat');
-        var PricesType = Parse.Object.extend('Prices');
+        var SpeciesType  = Parse.Object.extend('Species');
+        var CategoryType = Parse.Object.extend('Category');
+        var AnimalType   = Parse.Object.extend('Animal');
+        var MeatType     = Parse.Object.extend('Meat');
+        var PricesType   = Parse.Object.extend('Prices');
 
         var priceQuery = new Parse.Query('Prices');
 
@@ -272,23 +272,23 @@
             {
                 animals.forEach(function(animal)
                 {
-                    var animalname = animal.get('identifier');
+                    var animalID = animal.get('identifier');
 
                     var newRow = animalsTable.row.add([
                         animal.get('species'),
-                        animalname,
+                        animalID,
                         moment(animal.get('born')).format('YYYY-MM-DD'),
                         moment(animal.get('slaughtered')).format('YYYY-MM-DD')
                     ]);
 
                     $(newRow).data('animal',animal);
 
-                    $('.ui.dropdown.animalname .menu').append(
-                        $('<div>').addClass('item').attr({ 'data-value': animalname }).text(animalname)
+                    $('.ui.dropdown.animalID .menu').append(
+                        $('<div>').addClass('item').attr({ 'data-value': animalID }).text(animalID).data('animal',animal)
                     );
                 });
 
-                $('.ui.dropdown.animalname').dropdown();
+                $('.ui.dropdown.animalID').dropdown();
                 animalsTable.draw();
             }
         });
@@ -303,19 +303,16 @@
             slaughterdate = (slaughterdate == '' ? null : moment(slaughterdate,'YYYY-MM-DD').toDate());
 
             var newspecies = !$('.form.newanimalform .speciesname .item[data-value="' + speciesname + '"]').length;
-            console.log('New species ('+speciesname+')?: '+newspecies);
             if(newspecies)
             {
                 var parseSpecies = new SpeciesType();
-                parseSpecies.save({ species: speciesname },
+                parseSpecies.save({ species: speciesname, description: '' },
                     {
                         success: function(species)
                         {
-                            console.log('making new species');
                             $('.ui.dropdown.speciesname .menu')
                                 .append($('<div>').addClass('item').attr({ 'data-value': speciesname }).text(speciesname));
                             $('.ui.dropdown.speciesname').dropdown();
-                            console.log('made');
                         }
                     });
             }
@@ -331,23 +328,22 @@
             {
                 success: function(animal)
                 {
-                    console.log('making new animal');
-                    var animalname = animal.get('identifier');
+                    var animalID = animal.get('identifier');
 
                     var newRow = animalsTable.row.add([
                         animal.get('species'),
-                        animalname,
+                        animalID,
                         moment(animal.get('born')).format('YYYY-MM-DD'),
                         moment(animal.get('slaughtered')).format('YYYY-MM-DD')
                     ]);
 
                     $(newRow).data('animal',animal);
 
-                    $('.ui.dropdown.animalname .menu').append(
-                        $('<div>').addClass('item').attr({ 'data-value': animalname }).text(animalname)
+                    $('.ui.dropdown.animalID .menu').append(
+                        $('<div>').addClass('item').attr({ 'data-value': animalID }).text(animalID).data('animal',animal)
                     );
 
-                    $('.ui.dropdown.animalname').dropdown();
+                    $('.ui.dropdown.animalID').dropdown();
                     animalsTable.draw();
                 },
                 error: function(animal, err)
@@ -365,18 +361,216 @@
             $('.form.newanimalform .ui.dropdown .menu .item.filtered').removeClass('filtered');
         });
 
+
+        $('.form.newmeatform').form({
+            speciesname: {
+                identifier: 'speciesname',
+                rules: [ { type: 'notentercheck', prompt: 'Please specify a species' } ]
+            },
+            categoryname: {
+                identifier: 'categoryname',
+                rules: [ { type: 'notentercheck', prompt: 'Please specify a category' } ]
+            },
+            cutname: {
+                identifier: 'cutname',
+                rules: [ { type: 'notentercheck', prompt: 'Please specify a cut' } ]
+            },
+            units: {
+                identifier: 'units',
+                rules: [ { type: 'empty', prompt: 'Please specify number of units' },
+                         { type: 'unitscheck', prompt: 'Units must be decimal number less than 100 and greater than 0' }
+                 ]
+            }
+        }, {
+            on: 'blur',
+            inline: true,
+            rules: {
+                notentercheck: function()
+                {
+                    var name = $(this).getSemanticDropdownValue();
+                    return !(/^Enter/).test(name);
+                },
+                unitscheck: function ()
+                {
+                    var numUnits = parseFloat($(this).val());
+                    if(isNaN(numUnits) || numUnits < 0.0 || numUnits > 99.99) return false;
+                    return true;
+                }
+            }
+        });
+
         var addedMeatTable = $('.addedMeatTable').DataTable({
             autoWidth: false,
             columnDefs: [
-                { targets: 0, title: 'Species',     width: '4em' },
-                { targets: 1, title: 'Category',  width: '6em' },
-                { targets: 2, title: 'Cut',        width: '4em' },
+                { targets: 0, title: 'Species'     , width: '4em' },
+                { targets: 1, title: 'Category'    , width: '6em' },
+                { targets: 2, title: 'Cut'         , width: '4em' },
                 { targets: 3, title: 'Units/Weight', width: '4em' },
-                { targets: 4, title: 'Animal', width: '4em' }
+                { targets: 4, title: 'Animal'      , width: '4em' }
             ],
             order: [1, 'asc'],
             paging: false,
             dom: 'rt',
+        });
+
+        $('.addmeatbutton').click(function()
+        {
+            var speciesname  = $('.form.newmeatform #speciesname').getSemanticDropdownValue();
+            var categoryname = $('.form.newmeatform #categoryname').getSemanticDropdownValue();
+            var cutname      = $('.form.newmeatform #cutname').getSemanticDropdownValue();
+            var unitsQty     = parseFloat($('.form.newmeatform #units').val());
+            var animalID     = $('.form.newmeatform #animalID').getSemanticDropdownValue();
+
+            var bitsPromises = [];
+
+            var newspecies = !$('.form.newmeatform .speciesname .item[data-value="' + speciesname + '"]').length;
+            if(newspecies)
+            {
+                var parseSpecies = new SpeciesType();
+                parseSpecies.save({ species: speciesname, description: '' }).then(
+                    function(species)
+                    {
+                        $('.ui.dropdown.speciesname .menu')
+                        .append($('<div>').addClass('item').attr({ 'data-value': speciesname }).text(speciesname));
+                        $('.ui.dropdown.speciesname').dropdown();
+                        return Parse.Promise.as('species added');
+                    });
+            }
+
+            (new Parse.Query('Category')).equalTo('species', speciesname).equalTo('category', categoryname).first().then(
+            function(category)
+            {
+                if(category)
+                {
+                    return Parse.Promise.as(category);
+                }
+                else
+                {
+                    return (new CategoryType()).save({ species: speciesname, category: categoryname, description: '' });
+                }
+            }).then(
+            function(category)
+            {
+                var newcategory = !$('.form.newmeatform .categoryname .item[data-value="' + categoryname + '"]').length;
+                if(newcategory)
+                {
+                    $('.ui.dropdown.categoryname .menu')
+                    .append($('<div>').addClass('item').attr({ 'data-value': categoryname }).text(categoryname));
+                    $('.ui.dropdown.categoryname').dropdown();
+                }
+                return Parse.Promise.as('ok');
+            });
+
+            var newanimal = !$('.form.newmeatform .animalID .item[data-value="' + animalID + '"]').length;
+            if(newanimal)
+            {
+                // Push a promise to create the animal
+                bitsPromises.push((new AnimalType()).save({ species: speciesname, identifier: animalID, born: null, slaughtered: null}).then(
+                function(animal)
+                {
+                    var newRow = animalsTable.row.add([
+                        speciesname,
+                        animalID,
+                        moment(null).format('YYYY-MM-DD'),
+                        moment(null).format('YYYY-MM-DD')
+                    ]);
+
+                    $(newRow).data('animal',animal);
+
+                    $('.ui.dropdown.animalID .menu').append(
+                        $('<div>').addClass('item').attr({ 'data-value': animalID }).text(animalID).data('animal',animal)
+                    );
+
+                    $('.ui.dropdown.animalID').dropdown();
+                    animalsTable.draw();
+
+                    return Parse.Promise.as(animal);
+                }));
+            }
+            else
+            {
+                // Read the animal from the jQuery data we stuck on the menu item
+                var existingAnimal = $('.form.newmeatform .animalID .item[data-value="' + animalID + '"]').data('animal');
+                bitsPromises.push(Parse.Promise.as(existingAnimal));
+            }
+
+            bitsPromises.push((new Parse.Query('Prices'))
+            .equalTo('species', speciesname)
+            .equalTo('category', categoryname)
+            .equalTo('cut', cutname)
+            .first().then(
+            function(price)
+            {
+                if(price)
+                {
+                    return Parse.Promise.as(price);
+                }
+                else
+                {
+                    return (new PricesType())
+                    .save({ species: speciesname, category: categoryname, cut: cutname, price: 0.0, units: '?' }).then(
+                    function(price)
+                    {
+                        var newcut = !$('.form.newmeatform .cutname .item[data-value="' + cutname + '"]').length;
+                        if(newcut)
+                        {
+                            $('.ui.dropdown.cutname .menu')
+                            .append($('<div>').addClass('item').attr({ 'data-value': cutname }).text(cutname));
+                            $('.ui.dropdown.cutname').dropdown();
+                        }
+
+                        return Parse.Promise.as(price);
+                    });
+                }
+            }));
+
+
+            // Now bitsPromises promises that both animal and price are set
+            Parse.Promise.when(bitsPromises).then(
+            function(animal, price)
+            {
+                (new MeatType()).save({
+                    animal: animal,
+                    cut: price,
+                    freezer: null,
+                    location: 'Not checked in yet',
+                    units: unitsQty
+                }).then(
+                function(meat)
+                {
+                    var newRow = addedMeatTable.row.add([
+                        speciesname,
+                        categoryname,
+                        cutname,
+                        unitsQty,
+                        animalID
+                    ]);
+
+                    $(newRow).data('meat',meat);
+
+                    addedMeatTable.draw();
+
+                    return Parse.Promise.as('added meat');
+                },
+                function(err)
+                {
+                    $('.modal.errors .message').text(err.message);
+                    $('.modal.errors').modal('show');
+                    return Parse.Promise.as('displayed error');
+                });
+            },
+            function(err)
+            {
+                $('.modal.errors .message').text(err.message);
+                $('.modal.errors').modal('show');
+                return Parse.Promise.as('displayed error');
+            });
+
+
+            $('.form.newmeatform #units').val('');
+            $('.form.newmeatform #units').focus()
+            $('.form.newmeatform .ui.dropdown').dropdown('save defaults');
+            $('.form.newmeatform .ui.dropdown .menu .item.filtered').removeClass('filtered');
         });
 
     </script>
