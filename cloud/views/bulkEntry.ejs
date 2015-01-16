@@ -29,15 +29,6 @@
                                             <div class="menu"></div>
                                         </div>
                                     </div>
-                                    <div class="five wide required field">
-                                        <label>Category</label>
-                                        <div class="ui fluid search selection dropdown categoryname">
-                                            <input id="categoryname" type="hidden" />
-                                            <i class="dropdown icon"></i>
-                                            <div class="default text">Enter Category...</div>
-                                            <div class="menu"></div>
-                                        </div>
-                                    </div>
                                     <div class="seven wide required field">
                                         <label>Cut</label>
                                         <div class="ui fluid search selection dropdown cutname">
@@ -47,13 +38,22 @@
                                             <div class="menu"></div>
                                         </div>
                                     </div>
+                                    <div class="five wide required field">
+                                        <label>Category</label>
+                                        <div class="ui fluid search selection dropdown categoryname">
+                                            <input id="categoryname" type="hidden" />
+                                            <i class="dropdown icon"></i>
+                                            <div class="default text">Enter Category...</div>
+                                            <div class="menu"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="fields">
                                     <div class="four wide required field">
                                         <label>Units/Weight</label>
                                         <input id="units" type="text" placeholder="Units" />
                                     </div>
-                                    <div class="six wide field">
+                                    <div class="five wide field">
                                         <label>Animal</label>
                                         <div class="ui fluid search selection dropdown animalID">
                                             <input id="animalID" type="hidden"></input>
@@ -61,6 +61,10 @@
                                             <div class="default text">Animal ID</div>
                                             <div class="menu"></div>
                                         </div>
+                                    </div>
+                                    <div class="three wide field">
+                                        <label>Qty</label>
+                                        <input id="qty" type="text" placeholder="1" />
                                     </div>
                                 </div>
                                 <div class="ui right floated teal submit addmeatbutton button">Add</div>
@@ -295,6 +299,8 @@
 
         $('.addanimalbutton').click(function()
         {
+            if(!$('.form.newanimalform').form('validate form')) { return false; }
+
             var speciesname = $('.form.newanimalform #speciesname').getSemanticDropdownValue();
             var animalID = $('.form.newanimalform #animalID').val();
             var borndate = $('.form.newanimalform #borndate').val();
@@ -380,6 +386,10 @@
                 rules: [ { type: 'empty', prompt: 'Please specify number of units' },
                          { type: 'unitscheck', prompt: 'Units must be decimal number less than 100 and greater than 0' }
                  ]
+            },
+            qty: {
+                identifier: 'qty',
+                rules: [ { type: 'intorempty', prompt: 'Quantity must be an integer' } ]
             }
         }, {
             on: 'blur',
@@ -389,6 +399,10 @@
                 {
                     var name = $(this).getSemanticDropdownValue();
                     return !(/^Enter/).test(name);
+                },
+                intorempty: function ()
+                {
+                    return $(this).val() == '' || !isNaN(parseInt($this.val()));
                 },
                 unitscheck: function ()
                 {
@@ -415,11 +429,15 @@
 
         $('.addmeatbutton').click(function()
         {
+            if(!$('.form.newmeatform').form('validate form')) { return false; }
+
             var speciesname  = $('.form.newmeatform #speciesname').getSemanticDropdownValue();
             var categoryname = $('.form.newmeatform #categoryname').getSemanticDropdownValue();
             var cutname      = $('.form.newmeatform #cutname').getSemanticDropdownValue();
             var unitsQty     = parseFloat($('.form.newmeatform #units').val());
             var animalID     = $('.form.newmeatform #animalID').getSemanticDropdownValue();
+            var qty          = parseInt($('.form.newmeatform #qty').val());
+            if(isNaN(qty)) { qty = 1; }
 
             var bitsPromises = [];
 
@@ -529,35 +547,40 @@
             Parse.Promise.when(bitsPromises).then(
             function(animal, price)
             {
-                (new MeatType()).save({
-                    animal: animal,
-                    cut: price,
-                    freezer: null,
-                    location: 'Not checked in yet',
-                    units: unitsQty
-                }).then(
-                function(meat)
+                console.log("Qty: "+qty);
+                while(qty--)
                 {
-                    var newRow = addedMeatTable.row.add([
-                        speciesname,
-                        categoryname,
-                        cutname,
-                        unitsQty,
-                        animalID
-                    ]);
+                    console.log('save one');
+                    (new MeatType()).save({
+                        animal: animal,
+                        cut: price,
+                        freezer: null,
+                        location: 'Not checked in yet',
+                        units: unitsQty
+                    }).then(
+                    function(meat)
+                    {
+                        var newRow = addedMeatTable.row.add([
+                            speciesname,
+                            categoryname,
+                            cutname,
+                            unitsQty,
+                            animalID
+                        ]);
 
-                    $(newRow).data('meat',meat);
+                        $(newRow).data('meat',meat);
 
-                    addedMeatTable.draw();
+                        addedMeatTable.draw();
 
-                    return Parse.Promise.as('added meat');
-                },
-                function(err)
-                {
-                    $('.modal.errors .message').text(err.message);
-                    $('.modal.errors').modal('show');
-                    return Parse.Promise.as('displayed error');
-                });
+                        return Parse.Promise.as('added meat');
+                    },
+                    function(err)
+                    {
+                        $('.modal.errors .message').text(err.message);
+                        $('.modal.errors').modal('show');
+                        return Parse.Promise.as('displayed error');
+                    });
+                }
             },
             function(err)
             {
@@ -566,8 +589,8 @@
                 return Parse.Promise.as('displayed error');
             });
 
-
             $('.form.newmeatform #units').val('');
+            $('.form.newmeatform #qty').val('');
             $('.form.newmeatform #units').focus()
             $('.form.newmeatform .ui.dropdown').dropdown('save defaults');
             $('.form.newmeatform .ui.dropdown .menu .item.filtered').removeClass('filtered');
