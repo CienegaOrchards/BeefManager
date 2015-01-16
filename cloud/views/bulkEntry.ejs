@@ -157,6 +157,8 @@
         var AnimalType   = Parse.Object.extend('Animal');
         var MeatType     = Parse.Object.extend('Meat');
         var PricesType   = Parse.Object.extend('Prices');
+        var NewMeatPseudoFreezer = new (Parse.Object.extend('Freezer'));
+        NewMeatPseudoFreezer.id = 'YneyotzjIk';
 
         var priceQuery = new Parse.Query('Prices');
 
@@ -487,7 +489,7 @@
                 },
                 intorempty: function ()
                 {
-                    return $(this).val() == '' || !isNaN(parseInt($this.val()));
+                    return $(this).val() == '' || !isNaN(parseInt($(this).val()));
                 },
                 unitscheck: function ()
                 {
@@ -637,7 +639,7 @@
                     (new MeatType()).save({
                         animal: animal,
                         cut: price,
-                        freezer: null,
+                        freezer: NewMeatPseudoFreezer,
                         location: 'Not checked in yet',
                         units: unitsQty
                     }).then(
