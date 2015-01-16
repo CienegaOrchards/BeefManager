@@ -4,27 +4,27 @@
     <% include include/jquery-header.ejs %>
     <% include include/parse-header.ejs %>
     <% include include/semantic-header.ejs %>
-    <% var moment = require('moment'); %>
+
     <title>QR Codes</title>
+
 </head>
-<body class='qrcodes'>
-    <%
-        meats.forEach(function(meat) {
-        var cut = meat.get('cut');
-        var freezer = meat.get('freezer');
-        var animal = meat.get('animal');
-        for(i=0; i<4; i++)
-        {
-        %><div class='qrcode' desc='<%= meat.get('units')+cut.get('units')+" "+cut.get('species')+" "+cut.get('cut') %>' ident='<%= meat.id %>'></div><%
-        }
-    })%>
+<body>
+
+    <div class="ui fixed large teal main menu"></div>
+
+    <div class="main content qrcodes"></div>
 
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
+    <% include include/semantic-scripts.ejs %>
     <% include include/qrcode-scripts.ejs %>
 
-    <script type="text/javascript">
-    $(function() {
+    <script>
+
+
+
+    $(function()
+    {
         var fonts = $.Deferred();
         WebFontConfig = {
             google: { families: [ 'Amatic+SC:700:latin' ] },
@@ -38,17 +38,31 @@
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(wf, s);
 
+        var newMeatFreezer = new (Parse.Object.extend('Freezer'));
+        newMeatFreezer.id = 'YneyotzjIk';
+
         fonts.done(function()
-                    {
-                        $(".qrcode").each(function() {
-                            $(this).qrcode({
+        {
+            (new Parse.Query('Meat'))
+            .equalTo('freezer', newMeatFreezer)
+            .addAscending('units')
+            .include('cut')
+            .limit(1000)
+            .find(function(meats)
+            {
+                meats.forEach(
+                function(meat)
+                {
+                    var cut = meat.get('cut');
+                    $('.main.content').append(
+                        $('<div>').addClass('qrcode').qrcode({
                                 size: 600, // 600 DPI
 
                                 ecLevel: 'H',
 
                                 fill: '#000',
                                 background: '#fff',
-                                text: '{"desc":"'+$(this).attr('desc')+'","id":"'+$(this).attr('ident')+'"}',
+                                text: '{"desc":"'+meat.get('units')+cut.get('units')+' '+cut.get('species')+' '+cut.get('cut')+'","id":"'+meat.id+'"}',
 
                                 minVersion: 13,
                                 maxVersion: 13,
@@ -59,10 +73,14 @@
                                 fontname: 'Amatic SC',
                                 fontcolor: '#c00',
 
-                                label: $(this).attr('desc')
-                            });
-                        });
-                    });
+                                label: meat.get('units')+cut.get('units')+' '+cut.get('species')+' '+cut.get('cut')
+                        })
+                    );
+
+                    return Parse.Promise.as('ok');
+                });
+            });
+        });
     });
     </script>
 </body>
