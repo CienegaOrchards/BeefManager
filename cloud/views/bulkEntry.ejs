@@ -172,8 +172,18 @@
                 prices.forEach(function(price)
                 {
                     specieslist[price.get('species')] = true;
-                    categorylist[price.get('category')] = true;
-                    cutlist[price.get('cut')] = true;
+
+                    if(!categorylist[price.get('species')])
+                    {
+                        categorylist[price.get('species')] = {};
+                    }
+                    categorylist[price.get('species')][price.get('category')] = true;
+
+                    if(!cutlist[price.get('species')])
+                    {
+                        cutlist[price.get('species')] = {};
+                    }
+                    cutlist[price.get('species')][price.get('cut')] = price.get('category');
                 });
 
                 for(var speciesname in specieslist)
@@ -184,7 +194,93 @@
                             .append($('<div>').addClass('item').attr({ 'data-value': speciesname }).text(speciesname));
                     }
                 }
-                $('.ui.dropdown.speciesname').dropdown();
+                $('.ui.dropdown.speciesname').dropdown({
+                    onChange: function(val, text, choice)
+                    {
+                        // Limit cuts/cats dropdowns
+                        $('.ui.dropdown.cutname .menu .item').remove();
+                        $('.ui.dropdown.categoryname .menu .item').remove();
+                        for(var cutname in cutlist[val])
+                        {
+                            if(cutlist[val].hasOwnProperty(cutname))
+                            {
+                                $('.ui.dropdown.cutname .menu').append($('<div>').addClass('item').attr({ 'data-value': cutname, 'cat-name': cutlist[val][cutname] }).text(cutname));
+                            }
+                        }
+
+                        for(var categoryname in categorylist[val])
+                        {
+                            if(categorylist[val].hasOwnProperty(categoryname))
+                            {
+                                $('.ui.dropdown.categoryname .menu').append($('<div>').addClass('item').attr('data-value', categoryname).text(categoryname));
+                            }
+                        }
+
+                        $('.ui.dropdown.cutname').dropdown();
+                        $('.ui.dropdown.categoryname').dropdown();
+                    },
+                    onNoResults: function(val)
+                    {
+                        // Fully populate cuts/cats dropdown
+                        $('.ui.dropdown.cutname .menu .item').remove();
+                        $('.ui.dropdown.categoryname .menu .item').remove();
+                        for(var speciesname in cutlist)
+                        {
+                            if(cutlist.hasOwnProperty(speciesname))
+                            {
+                                for(var cutname in cutlist[speciesname])
+                                {
+                                    if(cutlist[speciesname].hasOwnProperty(cutname) &&
+                                     !$('.ui.dropdown.cutname .item[data-value="' + cutname + '"]').length)
+                                    {
+                                        $('.ui.dropdown.cutname .menu').append($('<div>').addClass('item').attr({ 'data-value': cutname, 'cat-name': cutlist[val][cutname] }).text(cutname));
+                                    }
+                                }
+
+                                for(var categoryname in categorylist[speciesname])
+                                {
+                                    if(categorylist[speciesname].hasOwnProperty(categoryname) &&
+                                     !$('.ui.dropdown.categoryname .item[data-value="' + categoryname + '"]').length)
+                                    {
+                                        $('.ui.dropdown.categoryname .menu').append($('<div>').addClass('item').attr('data-value', categoryname).text(categoryname));
+                                    }
+                                }
+                            }
+                        }
+
+                        $('.ui.dropdown.cutname').dropdown();
+                        $('.ui.dropdown.categoryname').dropdown();
+                    }
+                });
+
+                for(var speciesname in cutlist)
+                {
+                    if(cutlist.hasOwnProperty(speciesname))
+                    {
+                        for(var cutname in cutlist[speciesname])
+                        {
+                            if(cutlist[speciesname].hasOwnProperty(cutname))
+                            {
+                                if(!$('.ui.dropdown.cutname .item[data-value="' + cutname + '"]').length)
+                                {
+                                    $('.ui.dropdown.cutname .menu').append($('<div>').addClass('item').attr({ 'data-value': cutname, 'cat-name': cutlist[speciesname][cutname] }).text(cutname));
+                                }
+
+                                if(!$('.ui.dropdown.categoryname .item[data-value="' + cutlist[speciesname][cutname] + '"]').length)
+                                {
+                                    $('.ui.dropdown.categoryname .menu').append($('<div>').addClass('item').attr('data-value', cutlist[speciesname][cutname]).text(cutlist[speciesname][cutname]));
+                                }
+                            }
+                        }
+                    }
+                }
+                $('.ui.dropdown.cutname').dropdown({
+                    onChange: function(val, text, choice)
+                    {
+                        // Select the category that goes with this
+                        $('.ui.dropdown.categoryname').dropdown('set selected', choice.attr('cat-name'));
+                    }
+                });
 
                 for(var categoryname in categorylist)
                 {
@@ -195,16 +291,6 @@
                     }
                 }
                 $('.ui.dropdown.categoryname').dropdown();
-
-                for(var cutname in cutlist)
-                {
-                    if(cutlist.hasOwnProperty(cutname))
-                    {
-                        $('.ui.dropdown.cutname .menu')
-                            .append($('<div>').addClass('item').attr({ 'data-value': cutname }).text(cutname));
-                    }
-                }
-                $('.ui.dropdown.cutname').dropdown();
             }
         });
 
@@ -252,7 +338,6 @@
                 }
             }
         });
-
 
         var animalsTable = $('.animalsTable').DataTable({
             autoWidth: false,
@@ -533,7 +618,7 @@
                         if(newcut)
                         {
                             $('.ui.dropdown.cutname .menu')
-                            .append($('<div>').addClass('item').attr({ 'data-value': cutname }).text(cutname));
+                            .append($('<div>').addClass('item').attr({ 'data-value': cutname , 'cat-name': categoryname }).text(cutname));
                             $('.ui.dropdown.cutname').dropdown();
                         }
 
@@ -547,10 +632,8 @@
             Parse.Promise.when(bitsPromises).then(
             function(animal, price)
             {
-                console.log("Qty: "+qty);
                 while(qty--)
                 {
-                    console.log('save one');
                     (new MeatType()).save({
                         animal: animal,
                         cut: price,
