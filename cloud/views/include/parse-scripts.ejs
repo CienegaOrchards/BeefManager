@@ -24,25 +24,41 @@ var doMenu = function()
         .appendTo('.main.menu');
     });
 
-    var logInOrOutDetails;
-    if(Parse.User.current())
+    (new Parse.Query(Parse.Role))
+    .equalTo("name", "admin")
+    .equalTo("users", Parse.User.current())
+    .first()
+    .then(
+    function(adminRole)
     {
-        $('<a>', { text: 'Entry', href: '/bulkEntry' }).addClass('item').prepend(
-            $('<i>').addClass('large write icon')
-        ).appendTo('.main.menu');
-
-        $('<a>', { text: 'Logout (' + Parse.User.current().get('realname') + ')' }).addClass('right item').prepend(
-            $('<i>').addClass('large ban icon')
-        ).appendTo('.main.menu').click(logOut);
-    }
-    else
+        if(adminRole)
+        {
+            $('<a>', { text: 'Entry', href: '/bulkEntry' }).addClass('item').prepend(
+                $('<i>').addClass('large write icon')
+            ).appendTo('.main.menu');
+        }
+        return Parse.Promise.as('ok');
+    })
+    .always(
+    function()
     {
-        $('<a>', { text: 'Login' }).addClass('right item').prepend(
-            $('<i>').addClass('large user icon')
-        ).appendTo('.main.menu').click(logIn);
-    }
+        if(Parse.User.current())
+        {
+            $('<a>', { text: 'Logout (' + Parse.User.current().get('realname') + ')' }).addClass('right item').prepend(
+                $('<i>').addClass('large ban icon')
+            ).appendTo('.main.menu').click(logOut);
+        }
+        else
+        {
+            $('<a>', { text: 'Login' }).addClass('right item').prepend(
+                $('<i>').addClass('large user icon')
+            ).appendTo('.main.menu').click(logIn);
+        }
 
-    $('.main.menu .item[href="'+location.pathname+'"]').addClass('active');
+        $('.main.menu .item[href="'+location.pathname+'"]').addClass('active');
+
+        return Parse.Promise.as('ok');
+    });
 }
 
 logIn = function()
