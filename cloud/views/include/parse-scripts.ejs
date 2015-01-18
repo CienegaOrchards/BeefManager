@@ -36,6 +36,9 @@ var doMenu = function()
             $('<a>', { text: 'Entry', href: '/bulkEntry' }).addClass('item').prepend(
                 $('<i>').addClass('large write icon')
             ).appendTo('.main.menu');
+            $('<a>', { text: 'Users', href: '/users' }).addClass('item').prepend(
+                $('<i>').addClass('large users icon')
+            ).appendTo('.main.menu');
         }
         return Parse.Promise.as('ok');
     })
