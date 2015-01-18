@@ -1,0 +1,104 @@
+<script>
+var logIn;
+var logOut;
+
+var postLoginChange;
+
+var doMenu = function()
+{
+    var menu = [
+        {title: 'Inventory', link: '/inventory', icon: 'list layout'},
+        {title: 'Prices', link: '/prices', icon: 'money'},
+        {title: 'QR Codes', link: '/qrcodes', icon: 'qrcode'},
+    ];
+
+    $('.main.menu').empty();
+    menu.forEach(function(item)
+    {
+        var menuItem = $('<a>',
+        {
+            text: item.title,
+            href: item.link
+        }).addClass('item')
+        .prepend($('<i>').addClass(item.icon).addClass('large icon'))
+        .appendTo('.main.menu');
+    });
+
+    (new Parse.Query(Parse.Role))
+    .equalTo("name", "admin")
+    .equalTo("users", Parse.User.current())
+    .first()
+    .then(
+    function(adminRole)
+    {
+        if(adminRole)
+        {
+            $('<a>', { text: 'Entry', href: '/bulkEntry' }).addClass('item').prepend(
+                $('<i>').addClass('large write icon')
+            ).appendTo('.main.menu');
+            $('<a>', { text: 'Users', href: '/users' }).addClass('item').prepend(
+                $('<i>').addClass('large users icon')
+            ).appendTo('.main.menu');
+        }
+        return Parse.Promise.as('ok');
+    })
+    .always(
+    function()
+    {
+        if(Parse.User.current())
+        {
+            $('<a>', { text: 'Logout (' + Parse.User.current().get('realname') + ')' }).addClass('right item').prepend(
+                $('<i>').addClass('large ban icon')
+            ).appendTo('.main.menu').click(logOut);
+        }
+        else
+        {
+            $('<a>', { text: 'Login' }).addClass('right item').prepend(
+                $('<i>').addClass('large user icon')
+            ).appendTo('.main.menu').click(logIn);
+        }
+
+        $('.main.menu .item[href="'+location.pathname+'"]').addClass('active');
+
+        return Parse.Promise.as('ok');
+    });
+}
+
+logIn = function()
+{
+    Parse.FacebookUtils.init({ // this line replaces FB.init({
+      appId      : '192526427617368', // Facebook App ID
+      version    : 'v2.2',
+      cookie     : true, // enable cookies to allow Parse to access the session
+      xfbml      : false
+    });
+
+    Parse.FacebookUtils.logIn('public_profile,email', {
+      success: function(user) {
+        // Populate the menu
+        doMenu();
+        if(postLoginChange) postLoginChange();
+      },
+      error: function(user, error) {
+        alert("User cancelled the Facebook login or did not fully authorize.");
+      }
+    });
+};
+
+(function(d, s, id){
+var js, fjs = d.getElementsByTagName(s)[0];
+if (d.getElementById(id)) {return;}
+js = d.createElement(s); js.id = id;
+js.src = "//connect.facebook.net/en_US/sdk.js";
+fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+logOut = function()
+{
+    Parse.User.logOut();
+    doMenu();
+    if(postLoginChange) postLoginChange();
+}
+
+$(doMenu);
+</script>

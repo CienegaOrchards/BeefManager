@@ -1,0 +1,59 @@
+{
+    "folders":
+    [
+        {
+            "path": "./",
+            "folder_exclude_patterns": [ "CMakeFiles" ],
+            "file_exclude_patterns": [
+                            "BeefManager.sublime-workspace",
+                            "CMakeCache.txt",
+                            "build.ninja",
+                            "rules.ninja",
+                            ".ninja_*",
+                            "cmake_install.cmake"
+                        ]
+        }
+    ],
+    "build_systems":
+    [
+        {
+            "name": "BeefManager - all",
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "all"],
+            "working_dir": "${project_path}",
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        },
+        {
+            "name": "BeefManager - clean",
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "clean"],
+            "working_dir": "${project_path}",
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+        },
+        {
+            "name": "BeefManager - ParseDeploy",
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "ParseDeploy"],
+            "working_dir": "${project_path}",
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+        },
+        {
+            "name": "BeefManager - rebuild_cache",
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "rebuild_cache"],
+            "working_dir": "${project_path}",
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+        },
+        {
+            "name": "BeefManager - MscgenDocs",
+            "cmd": ["ninja", "-f", "build.ninja", "-v", "MscgenDocs"],
+            "working_dir": "${project_path}",
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "path": "~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+        }
+    ]
+    }

@@ -1,0 +1,27 @@
+                                                        +--------------+
+                                                    +---+    Animal    |
+                                                    |   +--------------+
+                                                    |   |Species       |
+                                                    |   |Identifier    |
+                                                    |   |Born Date     |
+                                                    |   |Slaughter Date|
+                                                    |   +--------------+  +--------+
+                                        +--------+  |                     | Prices |
+                                  +-----+  Meat  |  |                     +--------+
+                                  |     +--------+  |                     |Species |
+                                  |     |Animal  +--+                     |Category|
+                     +---------+  |     |Cut     +------------------------+Cut     |
++-------------+      |OrderItem|  |     |Units   |                        |Price   |
+|Order        +--+   +---------+  |     |Freezer +---+   +----------+     |Unit    |
++-------------+  +---+Order    |  |     |Location|   +-+-+ Freezer  |     |Disabled|
+|Customer     |      |Meat     +--+     +--------+     | +----------+     +--------+
+|DeliveryPoint+--+   |Price    |                       | |Location  |
+|Paid         |  |   |Confirmed|                       | |Identifier|
+|Notes        |  |   |DeliVered|                       | +----------+
++-------------+  |   +---------+                       |
+                 |                                     |
+                 |                                     |
+                 |                                     |
+                 |                                     |
+                 |                                     |
+                 +-------------------------------------+

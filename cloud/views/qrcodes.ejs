@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include include/jquery-header.ejs %>
+    <% include include/parse-header.ejs %>
+    <% include include/semantic-header.ejs %>
+
+    <title>QR Codes</title>
+
+</head>
+<body>
+
+    <div class="ui fixed large teal main menu"></div>
+
+    <div class="main content qrcodes"></div>
+
+    <% include include/jquery-scripts.ejs %>
+    <% include include/parse-scripts.ejs %>
+    <% include include/semantic-scripts.ejs %>
+    <% include include/qrcode-scripts.ejs %>
+
+    <script>
+
+
+
+    $(function()
+    {
+        var fonts = $.Deferred();
+        WebFontConfig = {
+            google: { families: [ 'Amatic+SC:700:latin' ] },
+            active: function() { fonts.resolve(); }
+        };
+
+        var wf = document.createElement('script');
+        wf.src = '//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+
+        var newMeatFreezer = new (Parse.Object.extend('Freezer'));
+        newMeatFreezer.id = 'YneyotzjIk';
+
+        fonts.done(function()
+        {
+            (new Parse.Query('Meat'))
+            .equalTo('freezer', newMeatFreezer)
+            .addAscending('units')
+            .include('cut')
+            .limit(1000)
+            .find(function(meats)
+            {
+                meats.forEach(
+                function(meat)
+                {
+                    var cut = meat.get('cut');
+                    $('.main.content').append(
+                        $('<div>').addClass('qrcode').qrcode({
+                                size: 600, // 600 DPI
+
+                                ecLevel: 'H',
+
+                                fill: '#000',
+                                background: '#fff',
+                                text: '{"desc":"'+meat.get('units')+cut.get('units')+' '+cut.get('species')+' '+cut.get('cut')+'","id":"'+meat.id+'"}',
+
+                                minVersion: 13,
+                                maxVersion: 13,
+                                quiet: 4,
+                                mode: 2,
+                                mSize: 0.12,
+                                mPosY: 0.78,
+                                fontname: 'Amatic SC',
+                                fontcolor: '#c00',
+
+                                label: meat.get('units')+cut.get('units')+' '+cut.get('species')+' '+cut.get('cut')
+                        })
+                    );
+
+                    return Parse.Promise.as('ok');
+                });
+            });
+        });
+    });
+    </script>
+</body>
+</html>

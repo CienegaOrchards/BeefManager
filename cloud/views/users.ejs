@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include include/jquery-header.ejs %>
+    <% include include/parse-header.ejs %>
+    <% include include/semantic-header.ejs %>
+
+    <title>Users</title>
+
+</head>
+<body>
+    <div class="ui fixed large teal main menu"></div>
+
+    <div class="main content">
+        <div class="ui compact raised segment">
+            <a class="ui top attached massive label">Users</a>
+            <div class="content">
+                <table class="ui striped large table usersTable" summary="User info"></table>
+            </div>
+            <div id="userdimmer" class="ui inverted dimmer">
+                <div class="ui large text loader">Loading users data</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui modal errors">
+        <div class="content">
+            <div class="image">
+                <i class="red warning circle icon"></i>
+            </div>
+            <div class="description"><div class="ui header">Error</div><p class="message"></p></div>
+        </div>
+        <div class="actions">
+            <div class="ui primary circular button">OK</div>
+        </div>
+    </div>
+
+    <% include include/jquery-scripts.ejs %>
+    <% include include/parse-scripts.ejs %>
+    <% include include/semantic-scripts.ejs %>
+
+    <script>
+    var usersTable;
+
+    $(function()
+    {
+        $('#userdimmer').dimmer('show');
+
+        var headerFooterFormat = '<"ui two column grid"<"left aligned column"f><"right aligned column"<"addbutton">>>';
+        // Init DataTables
+        usersTable = $('.usersTable').DataTable({
+            autoWidth: false,
+            columnDefs: [
+                { targets: 0, title: 'UserID' },
+                { targets: 1, title: 'Real Name' },
+                { targets: 2, title: 'Admin', render:
+                function(data, type, row, meta)
+                {
+                    if(type != 'display') return data;
+                    var newCheckbox = $('<div>', { userID: row[0] }).addClass('ui toggle checkbox').append(
+                        $('<input>', { type: 'checkbox' })
+                        );
+                    if(data == true)
+                    {
+                        newCheckbox.find('input').attr('checked','checked');
+                    }
+                    return newCheckbox[0].outerHTML;
+                }},
+            ],
+            order: [[2,'desc'], [1,'asc']],
+            paging: false,
+            dom: headerFooterFormat + 'rt',
+        });
+
+        (new Parse.Query(Parse.User))
+        .each(
+        function(user)
+        {
+            var newRow = usersTable.row.add([
+                    user.id,
+                    user.get('realname'),
+                    false
+                ]).node();
+
+            $(newRow).data('parseUser', user);
+
+            return Parse.Promise.as('ok');
+        })
+        .then(
+        function()
+        {
+            usersTable.draw();
+
+            $('.ui.checkbox').checkbox();
+
+            $('.ui.checkbox').click(
+            function()
+            {
+                var theCheckbox = $(this);
+                Parse.Cloud.run('makeUserAdmin', {user: theCheckbox.attr('userID'), shouldadd: theCheckbox.hasClass('checked') })
+                .then(
+                function()
+                {
+                    console.log("Set admin on user '"+theCheckbox.attr('userID')+"' to "+theCheckbox.hasClass('checked'));
+                },
+                function(err)
+                {
+                    $('.modal.errors .message').empty()
+                    $('.modal.errors .message').append($('<pre>').text(err.message));
+                    $('.modal.errors').modal('show');
+                });
+            });
+        })
+        .then(
+        function()
+        {
+            return (new Parse.Query(Parse.Role)).equalTo('name','admin').first();
+        })
+        .then(
+        function(adminRole)
+        {
+            if(!adminRole) return Parse.Promise.error({message: 'You cannot use this function if you are not an admin user'});
+            return adminRole.getUsers().query().each(
+            function(adminUser)
+            {
+                $('.ui.checkbox[userID='+adminUser.id+']').checkbox('check');
+            });
+        })
+        .then(
+        function()
+        {
+            $('#userdimmer').dimmer('hide');
+        },
+        function(err)
+        {
+            $('.modal.errors .message').empty()
+            $('.modal.errors .message').append($('<pre>').text(err.message));
+            $('.modal.errors').modal('show');
+            $('#userdimmer').dimmer('hide');
+        });
+    });
+    </script>
+
+</body>
+</html>

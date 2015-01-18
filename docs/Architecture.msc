@@ -1,0 +1,56 @@
+msc
+{
+    # Options
+    hscale = "1.5";
+
+
+    # The entities
+    I [label="iOS"],
+    W [label="Web Site"],
+    C [label="Parse Code"],
+    D [label="Parse DB"];
+
+    --- [label="Receive Meat From Butcher"];
+    W rbox W [label="Go to 'Receive Meat' mode"];
+    W box W [label="Enter batch info"];
+    W => C [label="Create animal"];
+    C => D [label="Create animal"];
+    W box W [label="Enter type and weight of each cut"];
+    W => C [label="Create Meat"];
+    C => D [label="Create Meat"];
+    C => D [label="Create Cut/Price if necessary"];
+    W box W [label="No more meat, ie done"];
+    W -> C [label="done"];
+    C -> W [label="unprinted labels"];
+    W box W [label="Print labels"];
+    W rbox W [label="Attach labels then Add Meat To Freezer"];
+
+    --- [label="Add meat to freezer"];
+    I rbox I [label="Go to 'Checkin Meat' mode"];
+    I box I [label="Scan freezer label"];
+    I box I [label="Scan meat label"];
+    I => C [label="move(meat,freezer)"];
+    C => D [label="meat.freezer = freezer"];
+    I rbox I [label="No more meat, ie done"];
+    I -> C [label="done"];
+    C abox C [label="Check order(s) completed; send notification(s)"];
+
+    |||;
+    |||;
+
+    --- [label="Remove meat from freezer"];
+    I rbox I [label="Go to 'Checkout Meat' mode"];
+    I box I [label="Scan meat label"];
+    I => C [label="remove(meat)"];
+    C => D [label="meat.freezer=nil"];
+
+    |||;
+    |||;
+
+    --- [label="Deliver order to customer"];
+    I rbox I  [label="Go to 'Deliver' mode"];
+    I box I [label="Scan order label"];
+    I => C [label="delivered(order)"];
+    C => D [label="orders.delivered=true"];
+    C => D [label="orders.meats.freezer=nil"];
+}

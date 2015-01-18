@@ -1,7 +1,12 @@
-require('cloud/app.js');
+// Main routing
+var app = require('cloud/app.js');
 
-// Use Parse.Cloud.define to define as many cloud functions as you want.
-// For example:
-Parse.Cloud.define("hello", function(request, response) {
-  response.success("Hello world!");
-});
+require('cloud/roles.js')(app);
+
+app.get('/'         , function(req, res) { res.render('index'); });
+app.get('/inventory', function(req, res) { res.render('inventory'); });
+app.get('/prices'   , function(req, res) { res.render('prices'); });
+app.get('/bulkEntry', function(req, res) { res.render('bulkEntry'); });
+app.get('/qrcodes'  , function(req, res) { res.render('qrcodes'); });
+
+app.listen();
