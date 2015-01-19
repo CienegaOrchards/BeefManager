@@ -7,7 +7,7 @@ add_subdirectory(docs)
 # Main Parse build/upload
 
 add_custom_target( ParseDeploy ALL
-    COMMAND parse deploy
+    COMMAND parse deploy -d `git describe --tags --dirty`
     WORKING_DIRECTORY ${SRC_PATH}
     COMMENT "Deploying to Parse cloud"
     )
