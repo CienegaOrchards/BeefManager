@@ -68,7 +68,7 @@
             existing = $('<div>').addClass('ui raised attached segment species_'+speciesLabel);
 
             $('.main.content').append(
-                $('<div>',{class: 'specieswrapper'}).append(
+                $('<div>',{class: 'speciesholder'}).append(
                     $('<h1>').addClass('ui top attached block header').append(
                             $('<img>').addClass('ui middle aligned left floated tiny image').attr('src','/images/' + speciesLabel.toLowerCase() + '.svg'),
                             $('<div>').addClass('content').text(speciesStr)
@@ -213,35 +213,57 @@
         function()
         {
             var meat = $(this).closest('.card');
+
+            // Make a clone and insert it where the original is/was, then collapse original
+            var meatClone = meat.clone();
+            meat.before(meatClone);
+            collapseMeatCard(meat, 0);
+
+            // Track old category and species to collapse/remove as necessary on completion
+            var oldCategory = null;
+            var oldSpecies = null;
+            var newButtonContent;
+            var newLocation;
+
             if(!meat.closest('.shoppingcart').length)
             {
-                var meatClone = meat.clone();
+                oldCategory = meat.closest('.categoryholder');
+                oldSpecies = meat.closest('.speciesholder');
 
-                var oldCategory = meat.closest('.categoryholder');
+                newLocation = '.shoppingcart .cards';
+                newButtonContent = [$('<i>',{class:'small reply icon'}),'REMOVE'];
+            }
+            else
+            {
+                newLocation = makeCategory(meat.data('meat'));
+                newButtonContent = [$('<i>',{class:'small mail forward icon'}),'BUY'];
+            }
 
-                meat.before(meatClone);
-                meat.appendTo('.shoppingcart .cards');
-                collapseMeatCard(meat, 0);
-                meatClone.effect('transfer', { to: meat }).slideUp(
-                function()
+            // Change the button
+            $(this).empty();
+            $(this).append(newButtonContent);
+
+            // Animate transfer from orig position to new position
+            meat.appendTo(newLocation).hide().slideDown();
+            meatClone.effect('transfer', { to: meat }).slideUp(
+            function()
+            {
+                meatClone.remove();
+
+                // Check if category/species might now be empty
+                if(oldCategory)
                 {
-                    meatClone.remove();
                     if(!oldCategory.find('.card').length)
                     {
                         oldCategory.slideUp(400,function(){oldCategory.remove()});
                     }
-                }).dequeue();
-                meat.hide().slideDown();
+                    if(!oldSpecies.find('.card').length)
+                    {
+                        oldSpecies.slideUp(400,function(){oldSpecies.remove()});
+                    }
+                }
+            }).dequeue();
 
-                $(this).empty();
-                $(this).append($('<i>',{class:'small reply icon'}), 'REMOVE');
-            }
-            else
-            {
-                meat.appendTo(makeCategory(meat.data('meat')));
-                $(this).empty();
-                $(this).append($('<i>',{class:'small mail forward icon'}), 'BUY');
-            }
         });
 
         return newMeat.appendTo(makeCategory(meat));
