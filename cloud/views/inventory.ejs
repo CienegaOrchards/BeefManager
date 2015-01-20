@@ -7,12 +7,26 @@
 
     <title>Inventory</title>
 
+    <style>
+      .ui-effects-transfer { border: 1px solid black; }
+    </style>
 </head>
 <body>
     <div class="ui fixed large teal main menu"></div>
 
+    <div class="ui basic segment" style="padding: 0; margin: 0;">
         <div id="maincontent" class="ui basic segment main content" style="margin-right: 36em;">
+            <div class="ui right attached rail shoppingcart">
+                <div class="ui segment" style="padding-left:0; padding-right: 0; min-width:26em;">
+                    <h1 class="ui top attached block header" style="margin-top:-0.5em;">
+                        <i class="shop icon"></i>
+                        Shopping Cart
+                    </h1>
+                    <div class="ui basic segment"><div class="ui cards"></div></div>
+                </div>
+            </div>
         </div>
+    </div>
 
     <div class="ui small basic modal qrcode">
         <i class="close icon"></i>
@@ -54,11 +68,13 @@
             existing = $('<div>').addClass('ui raised attached segment species_'+speciesLabel);
 
             $('.main.content').append(
+                $('<div>',{class: 'specieswrapper'}).append(
                     $('<h1>').addClass('ui top attached block header').append(
                             $('<img>').addClass('ui middle aligned left floated tiny image').attr('src','/images/' + speciesLabel.toLowerCase() + '.svg'),
                             $('<div>').addClass('content').text(speciesStr)
                         ).css({'min-height':'3.4em'}),
                     existing
+                ).hide().slideDown()
             );
 
             (new Parse.Query('Species'))
@@ -93,12 +109,14 @@
             existing = $('<div>').addClass('ui cards category_'+speciesLabel+'__'+categoryLabel);
 
             species.append(
-                $('<div>').addClass('ui huge teal ribbon label').append(
-                    $('<h3>').addClass('ui header').text(categoryStr).prepend(
-                        $('<i>').addClass('inverted middle aligned angle right icon').css('padding-top','0.2rem')
-                    )
-                ),
-                existing
+                $('<div>',{class:'categoryholder'}).append(
+                    $('<div>').addClass('ui huge teal ribbon label').append(
+                        $('<h3>').addClass('ui header').text(categoryStr).prepend(
+                            $('<i>').addClass('inverted middle aligned angle right icon').css('padding-top','0.2rem')
+                        )
+                    ),
+                    existing
+                ).hide().slideDown()
             );
 
             (new Parse.Query('Category'))
@@ -120,6 +138,23 @@
         }
 
         return existing;
+    }
+
+    function collapseMeatCard(card, timing)
+    {
+        card.find('.location').fadeOut(timing);
+        card.find('.extra.content').fadeOut(timing);
+        card.animate({height:card.data('origHeight')},timing);
+    }
+
+    function expandMeatCard(card, timing)
+    {
+        if(!card.data('origHeight')) { card.data('origHeight',card.height()); }
+        card.find('.location').fadeIn(timing);
+        card.find('.extra.content').fadeIn(timing);
+        if(!card.data('finalHeight')) { card.data('finalHeight',card.height()); }
+        card.height(card.data('origHeight'));
+        card.animate({height:card.data('finalHeight')},timing);
     }
 
     function makeMeat(meat)
@@ -151,17 +186,63 @@
             $('<div>').addClass('content')
             .append(
                 $('<i>').addClass('right floated big qrcode icon').attr({ident: meat.id, desc: meatDescStr}),
-                $('<div>').addClass('right floated').append($('<div>').addClass('ui green tag label').text('$'+meatPriceStr)),
+                $('<div>').addClass('right floated').append($('<div>').addClass('ui green tag label').append('$ '+meatPriceStr)),
                 $('<div>').addClass('header').append($('<div>').addClass('ui teal small header').text(cutStr)),
                 $('<div>').addClass('meta').text(quantityStr + ' ' + unitStr + ' @ $' + pricePerUnitStr + '/' + unitStr),
-                $('<div>').addClass('left floated').append($('<i>').addClass('home icon')).appendText(locationStr),
-                $('<div>').addClass('right floated').append($('<i>').addClass('power icon')).appendText(freezerStr)
+                $('<div>').addClass('left floated location').append($('<i>').addClass('home icon')).appendText(locationStr).hide(),
+                $('<div>').addClass('right floated location').append($('<i>').addClass('power icon')).appendText(freezerStr).hide()
             ),
-            $('<div>').addClass('extra content')
+            $('<div>').addClass('extra content').hide()
             .append(
-                $('<div>').addClass('left floated').append($('<i>').addClass('calendar icon')).appendText('Butchered: ' + (slaughterDate ? moment(slaughterDate).fromNow() : 'unknown'))
-                )
+                $('<div>').addClass('left floated').append($('<i>').addClass('calendar icon')).appendText('Butchered: ' + (slaughterDate ? moment(slaughterDate).fromNow() : 'unknown')),
+                $('<div>',{class:'ui right floated teal mini button buybutton'}).append($('<i>',{class:'small mail forward icon'}), 'BUY')
+            )
         );
+        newMeat.data({ meat: meat });
+        newMeat.hover(
+        function() // in
+        {
+            expandMeatCard($(this), 400);
+        },
+        function() // out
+        {
+            collapseMeatCard($(this), 400)
+        });
+
+        newMeat.find('.buybutton').click(
+        function()
+        {
+            var meat = $(this).closest('.card');
+            if(!meat.closest('.shoppingcart').length)
+            {
+                var meatClone = meat.clone();
+
+                var oldCategory = meat.closest('.categoryholder');
+
+                meat.before(meatClone);
+                meat.appendTo('.shoppingcart .cards');
+                collapseMeatCard(meat, 0);
+                meatClone.effect('transfer', { to: meat }).slideUp(
+                function()
+                {
+                    meatClone.remove();
+                    if(!oldCategory.find('.card').length)
+                    {
+                        oldCategory.slideUp(400,function(){oldCategory.remove()});
+                    }
+                }).dequeue();
+                meat.hide().slideDown();
+
+                $(this).empty();
+                $(this).append($('<i>',{class:'small reply icon'}), 'REMOVE');
+            }
+            else
+            {
+                meat.appendTo(makeCategory(meat.data('meat')));
+                $(this).empty();
+                $(this).append($('<i>',{class:'small mail forward icon'}), 'BUY');
+            }
+        });
 
         return newMeat.appendTo(makeCategory(meat));
     }
@@ -186,20 +267,15 @@
             .include('cut')
             .include('freezer')
             .include('animal')
-            .limit(1000);
-
-        // Parse.Query.ascending(xyz) won't let you sort by sub-object fields like cut.species,
-        // so we form a collection and sort using a comparator
-        var meats = meatQuery.collection();
-
-        meats.fetch({
-            success: function(meats)
+            .each(
+            function(meat)
             {
-                meats.forEach(function(meat)
-                {
-                    makeMeat(meat);
-                });
-
+                makeMeat(meat);
+                return Parse.Promise.as('ok');
+            })
+            .then(
+            function()
+            {
                 fonts.done(function()
                             {
                                 $("i.qrcode").click(function(e)
@@ -237,12 +313,10 @@
                             });
 
             },
-            error: function(err)
+            function(err)
             {
                 $('.main.content').text('There was an error fetching data');
-            }
-        });
-
+            });
     });
     </script>
 </body>
