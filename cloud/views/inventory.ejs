@@ -17,11 +17,25 @@
     <div class="ui basic segment" style="padding: 0; margin: 0;">
         <div id="maincontent" class="ui basic segment main content" style="margin-right: 36em;">
             <div class="ui right attached rail shoppingcart">
-                <div class="ui segment" style="padding-left:0; padding-right: 0; min-width:26em;">
-                    <h1 class="ui top attached block header" style="margin-top:-0.5em;">
-                        <i class="shop icon"></i>
-                        Shopping Cart
-                    </h1>
+                <div class="ui tertiary teal segment" style="padding-left:0; padding-right: 0; min-width:26em;">
+                    <div class="ui grid">
+                        <div class="center aligned nine wide column">
+                            <h2 class="ui header" style="margin-top:0.3em;">
+                                <i class="shop icon"></i>
+                                Shopping Cart
+                            </h2>
+                        </div>
+                        <div class="right aligned four wide column">
+                            <div class="ui tiny statistic">
+                                <div class="label">
+                                    Total
+                                </div>
+                                <div class="value" style="font-size:1.5rem;">
+                                    <i class="dollar icon"></i>0.00
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="ui basic segment"><div class="ui cards"></div></div>
                 </div>
             </div>
@@ -224,19 +238,27 @@
             var oldSpecies = null;
             var newButtonContent;
             var newLocation;
+            var totalAmount = parseFloat($('.shoppingcart .statistic .value').text());
+            var parseMeat = meat.data('meat');
+            var meatPrice = parseMeat.get('units') * parseMeat.get('cut').get('price');
 
             if(!meat.closest('.shoppingcart').length)
             {
+                // We're adding to cart
                 oldCategory = meat.closest('.categoryholder');
                 oldSpecies = meat.closest('.speciesholder');
 
                 newLocation = '.shoppingcart .cards';
                 newButtonContent = [$('<i>',{class:'small reply icon'}),'REMOVE'];
+
+                totalAmount += meatPrice;
             }
             else
             {
                 newLocation = makeCategory(meat.data('meat'));
                 newButtonContent = [$('<i>',{class:'small mail forward icon'}),'BUY'];
+
+                totalAmount -= meatPrice;
             }
 
             // Change the button
@@ -264,6 +286,8 @@
                 }
             }).dequeue();
 
+            // Animate price change
+            $('.shoppingcart .statistic').slideUp(function(){$(this).find('.value').contents().last().replaceWith(totalAmount.toFixed(2))}).slideDown();
         });
 
         return newMeat.appendTo(makeCategory(meat));
