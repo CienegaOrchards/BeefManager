@@ -6,23 +6,11 @@ var postLoginChange;
 
 var doMenu = function()
 {
-    var menu = [
-        {title: 'Inventory', link: '/inventory', icon: 'list layout'},
-        {title: 'Prices', link: '/prices', icon: 'money'},
-        {title: 'QR Codes', link: '/qrcodes', icon: 'qrcode'},
-    ];
-
     $('.main.menu').empty();
-    menu.forEach(function(item)
-    {
-        var menuItem = $('<a>',
-        {
-            text: item.title,
-            href: item.link
-        }).addClass('item')
-        .prepend($('<i>').addClass(item.icon).addClass('large icon'))
-        .appendTo('.main.menu');
-    });
+
+    $('<a>', { text: 'Inventory', href: '/inventory' }).addClass('item').prepend(
+        $('<i>').addClass('large list layout icon')
+    ).appendTo('.main.menu');
 
     (new Parse.Query(Parse.Role))
     .equalTo("name", "admin")
@@ -33,6 +21,12 @@ var doMenu = function()
     {
         if(adminRole)
         {
+            $('<a>', { text: 'Prices', href: '/prices' }).addClass('item').prepend(
+                $('<i>').addClass('large money icon')
+            ).appendTo('.main.menu');
+            $('<a>', { text: 'QR Codes', href: '/qrcodes' }).addClass('item').prepend(
+                $('<i>').addClass('large qrcode icon')
+            ).appendTo('.main.menu');
             $('<a>', { text: 'Entry', href: '/bulkEntry' }).addClass('item').prepend(
                 $('<i>').addClass('large write icon')
             ).appendTo('.main.menu');
@@ -47,13 +41,13 @@ var doMenu = function()
     {
         if(Parse.User.current())
         {
-            $('<a>', { text: 'Logout (' + Parse.User.current().get('realname') + ')' }).addClass('right item').prepend(
+            $('<a>', { text: 'Logout (' + Parse.User.current().get('realname') + ')' }).addClass('item').prepend(
                 $('<i>').addClass('large ban icon')
             ).appendTo('.main.menu').click(logOut);
         }
         else
         {
-            $('<a>', { text: 'Login' }).addClass('right item').prepend(
+            $('<a>', { text: 'Login' }).addClass('item').prepend(
                 $('<i>').addClass('large user icon')
             ).appendTo('.main.menu').click(logIn);
         }
