@@ -202,11 +202,11 @@
         newMeat.hover(
         function() // in
         {
-            expandMeatCard($(this), 400);
+            expandMeatCard($(this), $.fx.speeds._default);
         },
         function() // out
         {
-            collapseMeatCard($(this), 400)
+            collapseMeatCard($(this), $.fx.speeds._default)
         });
 
         newMeat.find('.buybutton').click(
@@ -255,11 +255,11 @@
                 {
                     if(!oldCategory.find('.card').length)
                     {
-                        oldCategory.slideUp(400,function(){oldCategory.remove()});
+                        oldCategory.slideUp(function(){oldCategory.remove()});
                     }
                     if(!oldSpecies.find('.card').length)
                     {
-                        oldSpecies.slideUp(400,function(){oldSpecies.remove()});
+                        oldSpecies.slideUp(function(){oldSpecies.remove()});
                     }
                 }
             }).dequeue();
@@ -268,6 +268,8 @@
 
         return newMeat.appendTo(makeCategory(meat));
     }
+
+    $.fx.speeds._default = 250;
 
     $(function()
     {
