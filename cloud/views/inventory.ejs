@@ -8,7 +8,7 @@
     <title>Inventory</title>
 
     <style>
-      .ui-effects-transfer { border: 1px solid black; }
+        .ui-effects-transfer { border: 1px solid black; }
     </style>
 </head>
 <body>
@@ -202,7 +202,7 @@
         var locationStr = freezer === undefined || freezer === null ? meat.get('location') : freezer.get('location');
         var freezerStr = freezer === undefined || freezer === null ? 'N/A' : freezer.get('identifier');
 
-        var meatPriceStr = (quantity * pricePerUnit).toFixed(2)
+        var meatPriceStr = (Math.floor(meat.get('units') * cut.get('price') * 100)/100.0).toFixed(2)
         var meatDescStr = quantityStr + unitStr + " " + speciesStr + " " + cutStr;
 
         var newMeat = $('<div>').addClass('ui meat card')
@@ -248,9 +248,7 @@
             var oldSpecies = null;
             var newButtonContent;
             var newLocation;
-            var totalAmount = parseFloat($('.shoppingcart .statistic .value').text());
             var parseMeat = meat.data('meat');
-            var meatPrice = parseMeat.get('units') * parseMeat.get('cut').get('price');
             var speciesStr = parseMeat.get('cut').get('species')
 
             if(!meat.closest('.shoppingcart').length)
@@ -264,8 +262,6 @@
 
                 newLocation = '.shoppingcart .cards';
                 newButtonContent = [$('<i>',{class:'small reply icon'}),'REMOVE'];
-
-                totalAmount += meatPrice;
             }
             else
             {
@@ -275,8 +271,6 @@
 
                 meat.find('img.speciesicon').remove();
                 meat.find('i.qrcode').show();
-
-                totalAmount -= meatPrice;
             }
 
             // Change the button
@@ -304,8 +298,25 @@
                 }
             }).dequeue();
 
-            // Animate price change
-            $('.shoppingcart .statistic').slideUp(function(){$(this).find('.value').contents().last().replaceWith(totalAmount.toFixed(2))}).slideDown();
+            // Animate price change -- cloned meat has no .data('meat') so won't count, so we should be good
+            $('.shoppingcart .statistic').finish().slideUp(
+                function()
+                {
+                    var totalAmount = 0;
+                    $('.shoppingcart .card.meat').each(
+                        function()
+                        {
+                            var parseMeat = $(this).data('meat');
+                            if(parseMeat)
+                            {
+                                var meatPrice = Math.floor(parseMeat.get('units') * parseMeat.get('cut').get('price') * 100);
+                                totalAmount += meatPrice;
+                            }
+                        }
+                    );
+
+                    $(this).find('.value').data('total',totalAmount).contents().last().replaceWith((totalAmount/100.0).toFixed(2));
+                }).slideDown();
         });
 
         return newMeat.appendTo(makeCategory(meat));
