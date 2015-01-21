@@ -70,11 +70,21 @@
         });
     };
 
+    function makeLabelFromString(str)
+    {
+        return str.replace(/[^a-zA-Z]/g, '_');
+    }
+
+    function speciesIcon(species)
+    {
+        return '/images/' + makeLabelFromString(species).toLowerCase() + '.svg';
+    }
+
     function makeSpecies(meat)
     {
         var cut = meat.get('cut');
         var speciesStr = cut.get('species')
-        var speciesLabel = speciesStr.replace(/[^a-zA-Z]/g, '_');
+        var speciesLabel = makeLabelFromString(speciesStr);
 
         var existing = $('.ui.segment.species_'+speciesLabel);
         if(!existing || existing.size() == 0)
@@ -84,7 +94,7 @@
             $('.main.content').append(
                 $('<div>',{class: 'speciesholder'}).append(
                     $('<h1>').addClass('ui top attached block header').append(
-                            $('<img>').addClass('ui middle aligned left floated tiny image').attr('src','/images/' + speciesLabel.toLowerCase() + '.svg'),
+                            $('<img>').addClass('ui middle aligned left floated tiny image').attr('src',speciesIcon(speciesStr)),
                             $('<div>').addClass('content').text(speciesStr)
                         ).css({'min-height':'3.4em'}),
                     existing
@@ -112,9 +122,9 @@
     {
         var cut = meat.get('cut');
         var speciesStr = cut.get('species');
-        var speciesLabel = speciesStr.replace(/[^a-zA-Z]/g, '_');
+        var speciesLabel = makeLabelFromString(speciesStr);
         var categoryStr = cut.get('category');
-        var categoryLabel = categoryStr.replace(/[^a-zA-Z]/g, '_');
+        var categoryLabel = makeLabelFromString(categoryStr);
 
         var species = makeSpecies(meat);
         var existing = species.find('.ui.cards.category_'+speciesLabel+'__'+categoryLabel);
@@ -241,12 +251,16 @@
             var totalAmount = parseFloat($('.shoppingcart .statistic .value').text());
             var parseMeat = meat.data('meat');
             var meatPrice = parseMeat.get('units') * parseMeat.get('cut').get('price');
+            var speciesStr = parseMeat.get('cut').get('species')
 
             if(!meat.closest('.shoppingcart').length)
             {
-                // We're adding to cart
+                // Adding to cart
                 oldCategory = meat.closest('.categoryholder');
                 oldSpecies = meat.closest('.speciesholder');
+
+                // Swap icon to show species
+                meat.find('i.qrcode').hide().before($('<img>',{src:speciesIcon(speciesStr), class:'ui left floated mini image speciesicon'}));
 
                 newLocation = '.shoppingcart .cards';
                 newButtonContent = [$('<i>',{class:'small reply icon'}),'REMOVE'];
@@ -255,8 +269,12 @@
             }
             else
             {
+                // Removing from cart
                 newLocation = makeCategory(meat.data('meat'));
                 newButtonContent = [$('<i>',{class:'small mail forward icon'}),'BUY'];
+
+                meat.find('img.speciesicon').remove();
+                meat.find('i.qrcode').show();
 
                 totalAmount -= meatPrice;
             }
