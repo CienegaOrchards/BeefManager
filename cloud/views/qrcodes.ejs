@@ -12,6 +12,15 @@
 
     <div class="ui fixed large teal main menu"></div>
 
+    <div class="ui form">
+        <h1 class="ui dividing header">Layout</h1>
+        <div class="two wide field">
+            <label>Stickers already used on first page</label>
+            <input type="text" id="startposition" placeholder="0 used"/>
+        </div>
+        <div class="ui divider"></div>
+    </div>
+
     <div class="main content qrcodes"></div>
 
     <% include include/jquery-scripts.ejs %>
@@ -25,6 +34,19 @@
 
     $(function()
     {
+        $('#startposition').change(function()
+        {
+            $('.qrcodes .emptycell').remove();
+            for(var i=parseInt($(this).val()); i>0; i--)
+            {
+                $('.qrcodes').prepend(
+                    $('<div>', {class: 'qrcode emptycell'}).append(
+                        $('<canvas>')
+                    )
+                );
+            }
+        });
+
         var fonts = $.Deferred();
         WebFontConfig = {
             google: { families: [ 'Amatic+SC:700:latin' ] },
