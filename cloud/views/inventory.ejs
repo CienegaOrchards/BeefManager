@@ -166,19 +166,19 @@
 
     function collapseMeatCard(card, timing)
     {
-        card.find('.location').fadeOut(timing);
-        card.find('.extra.content').fadeOut(timing);
-        card.animate({height:card.data('origHeight')},timing);
+        card.find('.location').finish().fadeOut(timing);
+        card.find('.extra.content').finish().fadeOut(timing);
+        card.finish().animate({height:card.data('origHeight')},timing);
     }
 
     function expandMeatCard(card, timing)
     {
         if(!card.data('origHeight')) { card.data('origHeight',card.height()); }
-        card.find('.location').fadeIn(timing);
-        card.find('.extra.content').fadeIn(timing);
+        card.find('.location').finish().fadeIn(timing);
+        card.find('.extra.content').finish().fadeIn(timing);
         if(!card.data('finalHeight')) { card.data('finalHeight',card.height()); }
         card.height(card.data('origHeight'));
-        card.animate({height:card.data('finalHeight')},timing);
+        card.finish().animate({height:card.data('finalHeight')},timing);
     }
 
     function makeMeat(meat)
