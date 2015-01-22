@@ -19,21 +19,26 @@
             <div class="ui right attached rail shoppingcart">
                 <div class="ui tertiary teal segment" style="padding-left:0; padding-right: 0; min-width:26em;">
                     <div class="ui grid">
-                        <div class="center aligned nine wide column">
-                            <h2 class="ui header" style="margin-top:0.3em;">
-                                <i class="shop icon"></i>
-                                Shopping Cart
-                            </h2>
-                        </div>
-                        <div class="right aligned four wide column">
-                            <div class="ui tiny statistic">
-                                <div class="label">
-                                    Total
-                                </div>
-                                <div class="value" style="font-size:1.5rem;">
-                                    <i class="dollar icon" style="margin-right:0.25rem;"></i>0.00
+                        <div class="row" style="padding-bottom:0;padding-left:1rem;padding-right:1rem;">
+                            <div class="left floated left aligned eleven wide column">
+                                <h2 class="ui header" style="margin-top:0.3em;">
+                                    <i class="shop icon"></i>
+                                    Shopping Cart
+                                </h2>
+                            </div>
+                            <div class="right floated center aligned five wide column">
+                                <div class="ui tiny statistic">
+                                    <div class="label">
+                                        Total
+                                    </div>
+                                    <div class="value" style="font-size:1.5rem;">
+                                        <i class="dollar icon" style="margin-right:0.25rem;"></i>0.00
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row" style="padding-bottom:0;padding-left:1rem;padding-right:1rem;">
+                            <div class="center aligned sixteen wide column"><div class="ui disabled right labeled icon mini button checkoutbutton"><i class="right arrow icon"></i>Checkout</div></div>
                         </div>
                     </div>
                     <div class="ui basic segment"><div class="ui cards"></div></div>
@@ -316,6 +321,14 @@
                     );
 
                     $(this).find('.value').data('total',totalAmount).contents().last().replaceWith((totalAmount/100.0).toFixed(2));
+                    if(totalAmount > 0)
+                    {
+                        $('.checkoutbutton').removeClass('disabled').addClass('positive');
+                    }
+                    else
+                    {
+                        $('.checkoutbutton').addClass('disabled').removeClass('positive');
+                    }
                 }).slideDown();
         });
 
