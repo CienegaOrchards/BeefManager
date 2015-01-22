@@ -8,8 +8,8 @@ var doMenu = function()
 {
     $('.main.menu').empty();
 
-    $('<a>', { text: 'Inventory', href: '/inventory' }).addClass('item').prepend(
-        $('<i>').addClass('large list layout icon')
+    $('<a>', { text: 'Buy', href: '/buy' }).addClass('item').prepend(
+        $('<i>').addClass('large shop icon')
     ).appendTo('.main.menu');
 
     (new Parse.Query(Parse.Role))
