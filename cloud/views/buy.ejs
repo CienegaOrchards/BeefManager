@@ -340,7 +340,9 @@
         s.parentNode.insertBefore(wf, s);
 
         var meatQuery = new Parse.Query('Meat')
-            .exists('freezer')
+            .exists('freezer')          // If "eaten" we clear freezer
+            .equalTo('lock', 0)         // Object locked by someone checking out
+            .doesNotExist('orderItem')  // Object part of an order
             .include('cut')
             .include('freezer')
             .include('animal')
