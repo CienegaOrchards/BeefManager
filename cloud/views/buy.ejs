@@ -223,6 +223,14 @@
         if(!card.data('finalHeight')) { card.data('finalHeight',card.height()); }
         card.height(card.data('origHeight'));
         card.finish().animate({height:card.data('finalHeight')},timing);
+
+        var docViewBottom = $(window).scrollTop() + $(window).height();
+        var elemTop = card.offset().top;
+
+        if(docViewBottom - elemTop < card.data('finalHeight'))
+        {
+            $(window).finish().scrollTo('+='+(card.data('finalHeight')-card.data('origHeight'))+'px',$.fx.speeds._default);
+        }
     }
 
     function makeMeat(meat)
