@@ -41,7 +41,7 @@
                             <div class="center aligned sixteen wide column"><div class="ui disabled right labeled icon mini button checkoutbutton"><i class="right arrow icon"></i>Checkout</div></div>
                         </div>
                     </div>
-                    <div class="ui basic segment"><div class="ui cards"></div></div>
+                    <div class="ui basic segment"><div class="ui cards"><div class="hidden start of shopping cart" style="display:none"></div></div></div>
                 </div>
             </div>
         </div>
@@ -67,6 +67,25 @@
     <% include include/moment-scripts.ejs %>
 
     <script type="text/javascript">
+
+    function getClosestValue(arr, val)
+    {
+        var lo = -1, hi = arr.length;
+        while (hi - lo > 1)
+        {
+            var mid = Math.round((lo + hi)/2);
+            if ($(arr[mid]).attr('data-sortorder') <= val)
+            {
+                lo = mid;
+            }
+            else
+            {
+                hi = mid;
+            }
+        }
+        if ($(arr[lo]).attr('data-sortorder') == val) hi = lo;
+        return $(arr[lo]);
+    }
 
     $.fn.appendText = function(text) {
         return this.each(function() {
@@ -94,10 +113,19 @@
         var existing = $('.ui.segment.species_'+speciesLabel);
         if(!existing || existing.size() == 0)
         {
-            existing = $('<div>').addClass('ui raised attached segment species_'+speciesLabel);
+            existing = $('<div>').addClass('ui raised attached segment species_'+speciesLabel).append(
+                $('<div>',{class: 'hidden start of species section',style:'display:none'})
+            );
 
-            $('.main.content').append(
-                $('<div>',{class: 'speciesholder'}).append(
+            // Find where to insert it
+            var insertAfterThisLocation = getClosestValue($('.main.content .speciesholder'), speciesStr);;
+            if(insertAfterThisLocation.length == 0)
+            {
+                insertAfterThisLocation = $('.main.content>.shoppingcart');
+            }
+
+            insertAfterThisLocation.after(
+                $('<div>',{class: 'speciesholder'}).attr('data-sortorder',speciesStr).append(
                     $('<h1>').addClass('ui top attached block header').append(
                             $('<img>').addClass('ui middle aligned left floated tiny image').attr('src',speciesIcon(speciesStr)),
                             $('<div>').addClass('content').text(speciesStr)
@@ -135,10 +163,21 @@
         var existing = species.find('.ui.cards.category_'+speciesLabel+'__'+categoryLabel);
         if(!existing || existing.size() == 0)
         {
-            existing = $('<div>').addClass('ui cards category_'+speciesLabel+'__'+categoryLabel);
+            existing = $('<div>').addClass('ui cards category_'+speciesLabel+'__'+categoryLabel).append(
+                $('<div>',{class:'hidden start of category section', style:'display:none'})
+            );
 
-            species.append(
-                $('<div>',{class:'categoryholder'}).append(
+            // Find where to insert it
+            var insertAfterThisLocation = getClosestValue(species.find('.categoryholder'), categoryStr);
+            if(insertAfterThisLocation.length == 0)
+            {
+                insertAfterThisLocation = species.find('.hidden.start.of.species.section');
+            }
+
+            console.log('  Insert '+categoryStr+' after '+insertAfterThisLocation.attr('data-sortorder'));
+
+            insertAfterThisLocation.after(
+                $('<div>',{class:'categoryholder'}).attr('data-sortorder',categoryStr).append(
                     $('<div>').addClass('ui huge teal ribbon label').append(
                         $('<h3>').addClass('ui header').text(categoryStr).prepend(
                             $('<i>').addClass('inverted middle aligned angle right icon').css('padding-top','0.2rem')
@@ -210,7 +249,7 @@
         var meatPriceStr = (Math.floor(meat.get('units') * cut.get('price') * 100)/100.0).toFixed(2)
         var meatDescStr = quantityStr + unitStr + " " + speciesStr + " " + cutStr;
 
-        var newMeat = $('<div>').addClass('ui meat card')
+        var newMeat = $('<div>').addClass('ui meat card').attr('data-sortorder', (speciesStr+' '+cutStr))
         .append(
             $('<div>').addClass('content')
             .append(
@@ -265,13 +304,26 @@
                 // Swap icon to show species
                 meat.find('i.qrcode').hide().before($('<img>',{src:speciesIcon(speciesStr), class:'ui left floated mini image speciesicon'}));
 
-                newLocation = '.shoppingcart .cards';
+                var cart = $('.shoppingcart .cards');
+                newLocation = getClosestValue(cart.find('.meat.card'), meat.attr('data-sortorder'));
+                if(newLocation.length == 0)
+                {
+                    newLocation = cart.find('.hidden.start.of.shopping.cart');
+                }
+
                 newButtonContent = [$('<i>',{class:'small reply icon'}),'REMOVE'];
             }
             else
             {
                 // Removing from cart
-                newLocation = makeCategory(meat.data('meat'));
+                var category = makeCategory(meat.data('meat'));
+                // Find where to insert it
+                newLocation = getClosestValue(category.find('.meat.card'), meat.attr('data-sortorder'));
+                if(newLocation.length == 0)
+                {
+                    newLocation = category.find('.hidden.start.of.category.section');
+                }
+
                 newButtonContent = [$('<i>',{class:'small mail forward icon'}),'BUY'];
 
                 meat.find('img.speciesicon').remove();
@@ -283,7 +335,7 @@
             $(this).append(newButtonContent);
 
             // Animate transfer from orig position to new position
-            meat.appendTo(newLocation).hide().slideDown();
+            meat.insertAfter(newLocation).hide().slideDown();
             meatClone.effect('transfer', { to: meat }).slideUp(
             function()
             {
@@ -332,7 +384,15 @@
                 }).slideDown();
         });
 
-        return newMeat.appendTo(makeCategory(meat));
+        var category = makeCategory(meat);
+        // Find where to insert it
+        var insertAfterThisLocation = getClosestValue(category.find('.meat.card'), newMeat.attr('data-sortorder'));
+        if(insertAfterThisLocation.length == 0)
+        {
+            insertAfterThisLocation = category.find('.hidden.start.of.category.section');
+        }
+
+        return newMeat.insertAfter(insertAfterThisLocation);
     }
 
     $.fx.speeds._default = 250;
