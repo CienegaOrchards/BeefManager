@@ -174,8 +174,6 @@
                 insertAfterThisLocation = species.find('.hidden.start.of.species.section');
             }
 
-            console.log('  Insert '+categoryStr+' after '+insertAfterThisLocation.attr('data-sortorder'));
-
             insertAfterThisLocation.after(
                 $('<div>',{class:'categoryholder'}).attr('data-sortorder',categoryStr).append(
                     $('<div>').addClass('ui huge teal ribbon label').append(
