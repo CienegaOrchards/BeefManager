@@ -13,6 +13,10 @@ var doMenu = function()
         $('<i>').addClass('large shop icon')
     ).appendTo('.main.menu');
 
+    $('<a>', { text: 'Orders', href: '/orders' }).addClass('item').prepend(
+        $('<i>').addClass('large ticket icon')
+    ).appendTo('.main.menu');
+
     (new Parse.Query(Parse.Role))
     .equalTo("name", "admin")
     .equalTo("users", Parse.User.current())

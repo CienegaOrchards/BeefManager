@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include include/jquery-header.ejs %>
+    <% include include/parse-header.ejs %>
+    <% include include/semantic-header.ejs %>
+
+    <title>Buy</title>
+
+    <style>
+        .ui-effects-transfer { border: 1px solid black; }
+    </style>
+</head>
+<body>
+    <div class="ui fixed large teal main menu"></div>
+
+    <div class="ui basic segment main content"><div class="hidden start of main content" style="display:none"></div></div>
+
+    <div class="ui small basic modal qrcode">
+        <i class="close icon"></i>
+        <div class="header">QR Code</div>
+        <div class="ui two column centered grid">
+            <div class="center aligned column">
+                <div class="ui image qrcode center aligned"></div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui positive button">OK</div>
+        </div>
+    </div>
+
+    <% include include/jquery-scripts.ejs %>
+    <% include include/parse-scripts.ejs %>
+    <% include include/semantic-scripts.ejs %>
+    <% include include/qrcode-scripts.ejs %>
+    <% include include/moment-scripts.ejs %>
+
+    <script type="text/javascript">
+
+    function getClosestValue(arr, val)
+    {
+        var lo = -1, hi = arr.length;
+        while (hi - lo > 1)
+        {
+            var mid = Math.round((lo + hi)/2);
+            if ($(arr[mid]).attr('data-sortorder') <= val)
+            {
+                lo = mid;
+            }
+            else
+            {
+                hi = mid;
+            }
+        }
+        if ($(arr[lo]).attr('data-sortorder') == val) hi = lo;
+        return $(arr[lo]);
+    }
+
+    function makeLabelFromString(str)
+    {
+        return str.replace(/[^a-zA-Z]/g, '_');
+    }
+
+    function speciesIcon(species)
+    {
+        return '/images/' + makeLabelFromString(species).toLowerCase() + '.svg';
+    }
+
+    function facebookProfilePic(customer)
+    {
+        return 'https://graph.facebook.com/'+customer.get('facebookID')+'/picture?height=80';
+    }
+
+    function makeCustomer(customer)
+    {
+        var customerName = customer.get('realname');
+        var customerLabel = makeLabelFromString(customerName);
+
+        var existing = $('.ui.segment.customer_'+customerLabel);
+        if(!existing || existing.size() == 0)
+        {
+            existing = $('<div>', {class: 'ui raised attached segment customer_'+customerLabel}).append(
+                $('<div>', {class: 'hidden start of customer section', style:'display:none'})
+            ).data('customer',customer);
+
+            // Find where to insert it
+            var insertAfterThisLocation = getClosestValue($('.main.content .customerholder'), customerName);
+            if(insertAfterThisLocation.length == 0)
+            {
+                insertAfterThisLocation = $('.hidden.start.of.main.content');
+            }
+
+            insertAfterThisLocation.after(
+                $('<div>',{class: 'customerholder'}).attr('data-sortorder',customerName).append(
+                    $('<h1>').addClass('ui top attached block header').append(
+                        $('<img>').addClass('ui middle aligned left floated avatar image').attr('src',facebookProfilePic(customer)),
+                        $('<div>').addClass('content').text(customerName),
+                        $('<div>', {class: 'sub header'}).text(customer.get('email')+' '+customer.get('phone'))
+                    ).css({'min-height':'3.4em'}),
+                    existing
+                ).hide().slideDown()
+            );
+        }
+
+        return existing;
+    }
+
+    function makeOrder(order)
+    {
+        var customer = order.get('customer');
+        var customerName = customer.get('realname');
+        var customerLabel = makeLabelFromString(customerName);
+        var orderLabel = makeLabelFromString(order.id);
+
+        var customerSection = makeCustomer(customer);
+        var existing = customerSection.find('.ui.cards.order_'+customerLabel+'__'+orderLabel);
+        if(!existing || existing.size() == 0)
+        {
+            existing = $('<div>').addClass('ui cards order_'+customerLabel+'__'+orderLabel).append(
+                $('<div>',{class:'hidden start of order section', style:'display:none'})
+            ).data('order',order);
+
+            // Find where to insert it
+            var insertAfterThisLocation = getClosestValue(customerSection.find('.orderholder'), order.id);
+            if(insertAfterThisLocation.length == 0)
+            {
+                insertAfterThisLocation = customerSection.find('.hidden.start.of.customer.section');
+            }
+
+            insertAfterThisLocation.after(
+                $('<div>',{class:'orderholder'}).attr('data-sortorder',order.id).append(
+                    $('<div>').addClass('ui huge teal ribbon label').append(
+                        $('<h3>').addClass('ui header').text('Order # '+order.id).prepend(
+                            $('<i>').addClass('inverted middle aligned angle right icon').css('padding-top','0.2rem')
+                        )
+                    ),
+                    $('<div>').addClass('ui basic segment').css('margin-top','1rem').append(
+                        $('<div>', {class: 'ui tiny statistics'}).append(
+                            $('<div>', {class:'statistic'}).append(
+                                $('<div>', {class: 'label'}).text('Order placed'),
+                                $('<div>', {class: 'value'}).text(moment(order.createdAt).format('YYYY/MM/DD'))
+                            ),
+                            $('<div>', {class:'statistic'}).append(
+                                $('<div>', {class: 'label'}).text('Total'),
+                                $('<div>', {class: 'value'}).append(
+                                    $('<i>',{class:'dollar icon'})
+                                ).appendText(order.get('totalPrice').toFixed(2))
+                            ),
+                            $('<div>', {class:'statistic'}).append(
+                                $('<div>', {class: 'label'}).text('Paid'),
+                                $('<div>', {class: 'value'}).append(
+                                    $('<i>',{class:'dollar icon'})
+                                ).appendText(order.get('paid').toFixed(2))
+                            ),
+                            $('<div>', {class:'balance statistic'}).append(
+                                $('<div>', {class: 'label'}).text('Balance'),
+                                $('<div>', {class: 'value'}).append(
+                                    $('<i>',{class:'dollar icon'})
+                                ).appendText((order.get('totalPrice')-order.get('paid')).toFixed(2))
+                            )
+                        )
+                    ),
+                    existing
+                ).hide().slideDown()
+            );
+        }
+
+        // If balance remaings, highlight it
+        if(order.get('totalPrice') > order.get('paid'))
+        {
+            existing.prev().find('.balance').addClass('red');
+        }
+
+        return existing;
+    }
+
+    function collapseMeatCard(card, timing)
+    {
+        card.find('.location').finish().fadeOut(timing);
+        card.find('.extra.content').finish().fadeOut(timing);
+        card.finish().animate({height:card.data('origHeight')},timing);
+    }
+
+    function expandMeatCard(card, timing)
+    {
+        if(!card.data('origHeight')) { card.data('origHeight',card.height()); }
+        card.find('.location').finish().fadeIn(timing);
+        card.find('.extra.content').finish().fadeIn(timing);
+        if(!card.data('finalHeight')) { card.data('finalHeight',card.height()); }
+        card.height(card.data('origHeight'));
+        card.finish().animate({height:card.data('finalHeight')},timing);
+
+        var docViewBottom = $(window).scrollTop() + $(window).height();
+        var elemTop = card.offset().top;
+
+        if(docViewBottom - elemTop < card.data('finalHeight'))
+        {
+            $(window).finish().scrollTo('+='+(card.data('finalHeight')-card.data('origHeight'))+'px',$.fx.speeds._default);
+        }
+    }
+
+    function makeMeat(meat)
+    {
+        var cut = meat.get('cut');
+        var animal = meat.get('animal');
+        var freezer = meat.get('freezer');
+        var orderItem = meat.get('orderItem');
+        var order = orderItem.get('order');
+        var customer = order.get('customer');
+
+        var quantity = meat.get('units');
+        var quantityStr = quantity.toFixed(2);
+
+        var speciesStr = cut.get('species');
+        var cutStr = cut.get('cut') === undefined ? '' : cut.get('cut');
+        var unitStr = cut.get('units');
+        var pricePerUnit = cut.get('price');
+        var pricePerUnitStr = pricePerUnit.toFixed(2);
+
+        var slaughterDate = animal === undefined ? null : animal.get('slaughtered');
+
+        var locationStr = freezer === undefined || freezer === null ? meat.get('location') : freezer.get('location');
+        var freezerStr = freezer === undefined || freezer === null ? 'N/A' : freezer.get('identifier');
+
+        var meatPriceStr = (Math.floor(meat.get('units') * cut.get('price') * 100)/100.0).toFixed(2)
+        var meatDescStr = quantityStr + unitStr + " " + speciesStr + " " + cutStr;
+
+        var newMeat = $('<div>').addClass('ui meat card').attr('data-sortorder', (speciesStr+' '+cutStr))
+        .append(
+            $('<div>').addClass('content')
+            .append(
+                $('<img>',{src:speciesIcon(speciesStr), class:'ui left floated mini image speciesicon'}).attr({ident: meat.id, desc: meatDescStr}),
+                $('<div>').addClass('right floated').append($('<div>').addClass('ui green tag label').append('$ '+meatPriceStr)),
+                $('<div>').addClass('header').append($('<div>').addClass('ui teal small header').text(cutStr)),
+                $('<div>').addClass('meta').text(quantityStr + ' ' + unitStr + ' @ $' + pricePerUnitStr + '/' + unitStr),
+                $('<div>').addClass('left floated location').append($('<i>').addClass('home icon')).appendText(locationStr).hide(),
+                $('<div>').addClass('right floated location').append($('<i>').addClass('power icon')).appendText(freezerStr).hide()
+            ),
+            $('<div>').addClass('extra content').hide()
+            .append(
+                $('<div>').addClass('left floated').append($('<i>').addClass('calendar icon')).appendText('Butchered: ' + (slaughterDate ? moment(slaughterDate).fromNow() : 'unknown'))
+            )
+        );
+        newMeat.data({ meat: meat });
+        if(locationStr != 'Atherton')
+        {
+            newMeat.css('background-color','rgb(210, 255, 255)');
+        }
+        newMeat.hover(
+        function() // in
+        {
+            expandMeatCard($(this), $.fx.speeds._default);
+        },
+        function() // out
+        {
+            collapseMeatCard($(this), $.fx.speeds._default)
+        });
+
+        var order = makeOrder(order);
+        // Find where to insert it
+        var insertAfterThisLocation = getClosestValue(order.find('.meat.card'), newMeat.attr('data-sortorder'));
+        if(insertAfterThisLocation.length == 0)
+        {
+            insertAfterThisLocation = order.find('.hidden.start.of.order.section');
+        }
+
+        return newMeat.insertAfter(insertAfterThisLocation);
+    }
+
+    $(function()
+    {
+        var fonts = $.Deferred();
+        WebFontConfig = {
+            google: { families: [ 'Amatic+SC:700:latin' ] },
+            active: function() { fonts.resolve(); }
+        };
+
+        var wf = document.createElement('script');
+        wf.src = '//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+
+        var meatQuery = new Parse.Query('Meat')
+            .exists('orderItem')  // Object part of an order
+            .include('cut')
+            .include('freezer')
+            .include('animal')
+            .include('orderItem')
+            .include('orderItem.order')
+            .include('orderItem.order.customer');
+
+        (new Parse.Query(Parse.Role))
+        .equalTo("name", "admin")
+        .equalTo("users", Parse.User.current())
+        .first()
+        .then(function(adminRole)
+        {
+            if (adminRole)
+            {
+                return Parse.Promise.as('is admin');
+            } else {
+                return Parse.Promise.error('not admin');
+            }
+        })
+
+        .then(function() // is admin
+        {
+            return Parse.Promise.as('ok');
+        })
+        .fail(function() // is not admin
+        {
+            // Limit query to just this user
+            var userLimitQuery = new Parse.Query('Order')
+                .equalTo('customer',Parse.User.current());
+
+            var orderItemSubQuery = new Parse.Query('OrderItem')
+                .matchesQuery('order', userLimitQuery);
+
+            meatQuery.matchesQuery('orderItem', orderItemSubQuery);
+
+            return Parse.Promise.as('ok');
+        })
+
+        .then(function()
+        {
+            return meatQuery.each(function(meat)
+            {
+                makeMeat(meat);
+                return Parse.Promise.as('ok');
+            });
+        })
+
+        .then(function()
+        {
+            // Once all meat is added, activate QR codes on meats
+            fonts.done(function()
+                        {
+                            $("img.speciesicon").click(function(e)
+                            {
+                                var ident = $(this).attr('ident');
+                                var desc = $(this).attr('desc');
+
+                                $('.modal.qrcode .image.qrcode').empty();
+
+                                $('.modal.qrcode .image.qrcode').qrcode({
+                                    size: 600, // 600 DPI
+
+                                    ecLevel: 'H',
+
+                                    fill: '#000',
+                                    background: '#fff',
+                                    text: '{"desc":"'+$(this).attr('desc')+'","id":"'+$(this).attr('ident')+'"}',
+
+                                    minVersion: 13,
+                                    maxVersion: 13,
+                                    quiet: 4,
+                                    mode: 2,
+                                    mSize: 0.12,
+                                    mPosY: 0.78,
+                                    fontname: 'Amatic SC',
+                                    fontcolor: '#c00',
+
+                                    label: $(this).attr('desc')
+                                });
+
+                                $('.modal.qrcode>.header').text(desc);
+
+                                $('.modal.qrcode').modal('show');
+                            });
+                        });
+
+            return Parse.Promise.as('ok');
+        })
+
+        .fail(function(err)
+        {
+            $('.main.content').text('There was an error fetching data');
+            return Parse.Promise.as('handled');
+        });
+    });
+    </script>
+</body>
+</html>
