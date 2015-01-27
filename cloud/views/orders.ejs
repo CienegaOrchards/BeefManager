@@ -34,6 +34,7 @@
     <% include include/semantic-scripts.ejs %>
     <% include include/qrcode-scripts.ejs %>
     <% include include/moment-scripts.ejs %>
+    <% include include/message-modal.ejs %>
 
     <script type="text/javascript">
 
@@ -412,8 +413,8 @@
 
         .fail(function(err)
         {
-            $('.main.content').text('There was an error fetching data');
-            console.log(err);
+            displayError('There was an error fetching data');
+            console.error(err);
             return Parse.Promise.as('handled');
         });
     });

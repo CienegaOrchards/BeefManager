@@ -1,0 +1,42 @@
+    <div class="ui modal notices">
+        <div class="content">
+            <div class="image">
+                <i class="red warning circle icon"></i>
+            </div>
+            <div class="description"><div class="ui header">Error</div><p class="message"></p></div>
+        </div>
+        <div class="actions">
+            <div class="ui primary circular button">OK</div>
+        </div>
+    </div>
+
+<script>
+
+    function displayInfo(msg)
+    {
+        console.log(msg);
+        $('.modal.notices .description .header').text('Info');
+        $('.modal.notices i').attr('class', 'info circle icon');
+        $('.modal.notices .message').text(msg);
+        $('.modal.notices').modal('show');
+    }
+
+    function displayWarning(msg)
+    {
+        console.warn(msg);
+        $('.modal.notices .description .header').text('Warning');
+        $('.modal.notices i').attr('class', 'yellow warning sign icon');
+        $('.modal.notices .message').text(msg);
+        $('.modal.notices').modal('show');
+    }
+
+    function displayError(msg)
+    {
+        console.error(msg);
+        $('.modal.notices .description .header').text('Error');
+        $('.modal.notices i').attr('class', 'red warning circle icon');
+        $('.modal.notices .message').text(msg);
+        $('.modal.notices').modal('show');
+    }
+
+</script>

@@ -132,23 +132,11 @@
         </div>
     </div>
 
-    <div class="ui modal errors">
-        <div class="content">
-            <div class="image">
-                <i class="red warning circle icon"></i>
-            </div>
-            <div class="description"><div class="ui header">Error</div><p class="message"></p></div>
-        </div>
-        <div class="actions">
-            <div class="ui primary circular button">OK</div>
-        </div>
-    </div>
-
-
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
     <% include include/semantic-scripts.ejs %>
     <% include include/moment-scripts.ejs %>
+    <% include include/message-modal.ejs %>
 
     <script>
         var priceTable;
@@ -441,8 +429,7 @@
                 },
                 error: function(animal, err)
                 {
-                    $('.modal.errors .message').text(err.message);
-                    $('.modal.errors').modal('show');
+                    displayError(err.message);
                 }
             });
 
@@ -661,16 +648,14 @@
                     },
                     function(err)
                     {
-                        $('.modal.errors .message').text(err.message);
-                        $('.modal.errors').modal('show');
+                        displayError(err.message);
                         return Parse.Promise.as('displayed error');
                     });
                 }
             },
             function(err)
             {
-                $('.modal.errors .message').text(err.message);
-                $('.modal.errors').modal('show');
+                displayError(err.message)
                 return Parse.Promise.as('displayed error');
             });
 
