@@ -5,7 +5,7 @@
     <% include include/parse-header.ejs %>
     <% include include/semantic-header.ejs %>
 
-    <title>Buy</title>
+    <title>Orders</title>
 
     <style>
         .ui-effects-transfer { border: 1px solid black; }
@@ -314,10 +314,12 @@
         {
             // Limit query to just this user
             var userLimitQuery = new Parse.Query('Order')
-                .equalTo('customer',Parse.User.current());
+                .equalTo('customer',Parse.User.current())
+                .limit(1000);
 
             var orderItemSubQuery = new Parse.Query('OrderItem')
-                .matchesQuery('order', userLimitQuery);
+                .matchesQuery('order', userLimitQuery)
+                .limit(1000);
 
             meatQuery.matchesQuery('orderItem', orderItemSubQuery);
 
@@ -411,6 +413,7 @@
         .fail(function(err)
         {
             $('.main.content').text('There was an error fetching data');
+            console.log(err);
             return Parse.Promise.as('handled');
         });
     });
