@@ -118,17 +118,17 @@
         {
             existing = $('<div>').addClass('ui cards order_'+customerLabel+'__'+orderLabel).append(
                 $('<div>',{class:'hidden start of order section', style:'display:none'})
-            ).data('order',order);
+            );
 
             // Find where to insert it
-            var insertAfterThisLocation = getClosestValue(customerSection.find('.orderholder'), order.id);
+            var insertAfterThisLocation = getClosestValue(customerSection.find('.orderholder'), moment(order.createdAt).format('YYYY/MM/DD'));
             if(insertAfterThisLocation.length == 0)
             {
                 insertAfterThisLocation = customerSection.find('.hidden.start.of.customer.section');
             }
 
             insertAfterThisLocation.after(
-                $('<div>',{class:'orderholder'}).attr('data-sortorder',order.id).append(
+                $('<div>',{class:'orderholder'}).attr('data-sortorder',moment(order.createdAt).format('YYYY/MM/DD')).append(
                     $('<div>').addClass('ui huge teal ribbon label').append(
                         $('<h3>').addClass('ui header').text('Order # '+order.id).prepend(
                             $('<i>').addClass('inverted middle aligned angle right icon').css('padding-top','0.2rem')
@@ -161,7 +161,7 @@
                         )
                     ),
                     existing
-                ).hide().slideDown()
+                ).data('order',order).hide().slideDown()
             );
         }
 
@@ -245,6 +245,7 @@
         if(locationStr != 'Atherton')
         {
             newMeat.css('background-color','rgb(210, 255, 255)');
+            newMeat.addClass('notlocal');
         }
         newMeat.hover(
         function() // in
@@ -336,40 +337,73 @@
         {
             // Once all meat is added, activate QR codes on meats
             fonts.done(function()
-                        {
-                            $("img.speciesicon").click(function(e)
-                            {
-                                var ident = $(this).attr('ident');
-                                var desc = $(this).attr('desc');
+            {
+                $("img.speciesicon").click(function(e)
+                {
+                    var ident = $(this).attr('ident');
+                    var desc = $(this).attr('desc');
 
-                                $('.modal.qrcode .image.qrcode').empty();
+                    $('.modal.qrcode .image.qrcode').empty();
 
-                                $('.modal.qrcode .image.qrcode').qrcode({
-                                    size: 600, // 600 DPI
+                    $('.modal.qrcode .image.qrcode').qrcode({
+                        size: 600, // 600 DPI
 
-                                    ecLevel: 'H',
+                        ecLevel: 'H',
 
-                                    fill: '#000',
-                                    background: '#fff',
-                                    text: '{"desc":"'+$(this).attr('desc')+'","id":"'+$(this).attr('ident')+'"}',
+                        fill: '#000',
+                        background: '#fff',
+                        text: '{"desc":"'+$(this).attr('desc')+'","id":"'+$(this).attr('ident')+'"}',
 
-                                    minVersion: 13,
-                                    maxVersion: 13,
-                                    quiet: 4,
-                                    mode: 2,
-                                    mSize: 0.12,
-                                    mPosY: 0.78,
-                                    fontname: 'Amatic SC',
-                                    fontcolor: '#c00',
+                        minVersion: 13,
+                        maxVersion: 13,
+                        quiet: 4,
+                        mode: 2,
+                        mSize: 0.12,
+                        mPosY: 0.78,
+                        fontname: 'Amatic SC',
+                        fontcolor: '#c00',
 
-                                    label: $(this).attr('desc')
-                                });
+                        label: $(this).attr('desc')
+                    });
 
-                                $('.modal.qrcode>.header').text(desc);
+                    $('.modal.qrcode>.header').text(desc);
 
-                                $('.modal.qrcode').modal('show');
-                            });
-                        });
+                    $('.modal.qrcode').modal('show');
+                });
+            });
+
+            // And check which orders are completed or ready for pickup
+            $('.orderholder').each(function()
+            {
+                var parseOrder = $(this).data('order');
+                if(parseOrder.get('completed'))
+                {
+                    var newDimmer = $('<div>', {class:'ui inverted dimmer'}).append(
+                        $('<div>',{class:'content'}).append(
+                            $('<div>',{class:'center'}).append(
+                                $('<h1>',{class:'ui icon header'}).append(
+                                    $('<i>',{class:'checkmark box icon'})
+                                ).appendText('Completed')
+                            )
+                        )
+                    );
+                    $(this).append(newDimmer);
+                    newDimmer.dimmer('show');
+                }
+                else
+                {
+                    // Check if everything is in Atherton
+                    var items = $(this).find('.meat.card.notlocal').length;
+                    if(items > 0)
+                    {
+                        $(this).find('.ribbon.label').appendText(items+' item'+(items>1?'s':'')+' not in Atherton');
+                    }
+                    else
+                    {
+                        $(this).find('.ribbon.label').appendText('Ready for pickup');
+                    }
+                }
+            });
 
             return Parse.Promise.as('ok');
         })
