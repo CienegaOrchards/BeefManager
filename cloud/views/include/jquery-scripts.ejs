@@ -3,3 +3,19 @@
 <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
 <script src="//cdn.jsdelivr.net/jquery.jeditable/1.7.3/jquery.jeditable.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.14/jquery.scrollTo.min.js"></script>
+
+<script>
+
+    $.fx.speeds._default = 250;
+
+    // jQuery helper function appends a text node to jQuery elements
+    $.fn.appendText = function(text)
+    {
+        return this.each(function()
+        {
+            var textNode = document.createTextNode(text);
+            $(this).append(textNode);
+        });
+    };
+
+</script>
