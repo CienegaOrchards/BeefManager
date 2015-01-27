@@ -87,13 +87,6 @@
         return $(arr[lo]);
     }
 
-    $.fn.appendText = function(text) {
-        return this.each(function() {
-            var textNode = document.createTextNode(text);
-            $(this).append(textNode);
-        });
-    };
-
     function makeLabelFromString(str)
     {
         return str.replace(/[^a-zA-Z]/g, '_');
