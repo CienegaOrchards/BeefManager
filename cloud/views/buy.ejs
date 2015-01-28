@@ -18,14 +18,12 @@
         <div id="maincontent" class="ui basic segment main content" style="margin-right: 36em;">
             <div class="ui right attached rail shoppingcart">
                 <div class="ui tertiary teal segment" style="padding-left:0; padding-right: 0; min-width:26em;">
-                    <div class="ui grid">
-                        <div class="row" style="padding-bottom:0;padding-left:1rem;padding-right:1rem;">
+                    <div class="ui grid" style="padding-bottom:0;padding-left:1rem;padding-right:1rem;">
                             <div class="left floated left aligned eleven wide column">
-                                <h2 class="ui header" style="margin-top:0.3em;">
-                                    <i class="shop icon"></i>
-                                    Shopping Cart
-                                </h2>
+                            <h2 class="ui header shoppingcartheader" style="margin-top:0.3em;"><i class="shop icon"></i>Shopping Cart</h2>
+                            <div class="ui loading right labeled huge positive icon button checkoutbutton"><i class="right arrow icon"></i>Checkout</div>
                             </div>
+
                             <div class="right floated center aligned five wide column">
                                 <div class="ui tiny statistic">
                                     <div class="label">
@@ -37,10 +35,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row" style="padding-bottom:0;padding-left:1rem;padding-right:1rem;">
-                            <div class="center aligned sixteen wide column"><div class="ui disabled right labeled icon mini button checkoutbutton"><i class="right arrow icon"></i>Checkout</div></div>
-                        </div>
-                    </div>
                     <div class="ui basic segment"><div class="ui cards"><div class="hidden start of shopping cart" style="display:none"></div></div></div>
                 </div>
             </div>
@@ -294,10 +288,12 @@
             var newLocation;
             var parseMeat = meat.data('meat');
             var speciesStr = parseMeat.get('cut').get('species')
+            var adding = false;
 
             if(!meat.closest('.shoppingcart').length)
             {
                 // Adding to cart
+                adding = true;
                 oldCategory = meat.closest('.categoryholder');
                 oldSpecies = meat.closest('.speciesholder');
 
@@ -334,8 +330,25 @@
             $(this).empty();
             $(this).append(newButtonContent);
 
-            // Animate transfer from orig position to new position
+            // Stick the real meat in the target position and animate it in
             meat.insertAfter(newLocation).hide().slideDown();
+
+            // Change shopping cart header/button
+            // Need checkout button if adding to cart or if cart has more than just the clone left
+            if(adding || $('.shoppingcart .meat.card').length > 1)
+            {
+                $('.shoppingcartheader').finish().slideUp();
+                $('.checkoutbutton').finish().slideDown();
+                $('.shoppingcart>.tertiary.segment>.basic.segment').slideDown();
+            }
+            else
+            {
+                $('.shoppingcart>.tertiary.segment>.basic.segment').slideUp();
+                $('.checkoutbutton').finish().slideUp();
+                $('.shoppingcartheader').finish().slideDown();
+            }
+
+            // Animate transfer from orig position to new position
             meatClone.effect('transfer', { to: meat }).slideUp(
             function()
             {
@@ -373,14 +386,6 @@
                     );
 
                     $(this).find('.value').data('total',totalAmount).contents().last().replaceWith((totalAmount/100.0).toFixed(2));
-                    if(totalAmount > 0)
-                    {
-                        $('.checkoutbutton').removeClass('disabled').addClass('positive');
-                    }
-                    else
-                    {
-                        $('.checkoutbutton').addClass('disabled').removeClass('positive');
-                    }
                 }).slideDown();
         });
 
@@ -397,6 +402,9 @@
 
     $(function()
     {
+        $('.checkoutbutton').hide();
+        $('.shoppingcart>.tertiary.segment>.basic.segment').hide();
+
         var fonts = $.Deferred();
         WebFontConfig = {
             google: { families: [ 'Amatic+SC:700:latin' ] },
