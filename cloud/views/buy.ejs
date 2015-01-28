@@ -420,6 +420,7 @@
 
         var meatQuery = new Parse.Query('Meat')
             .exists('freezer')          // If "eaten" we clear freezer
+            .notEqualTo('freezer',null) // Sometimes "exists" excludes null, sometimes it doesn't, it seems...
             .equalTo('lock', 0)         // Object locked by someone checking out
             .doesNotExist('orderItem')  // Object part of an order
             .include('cut')
