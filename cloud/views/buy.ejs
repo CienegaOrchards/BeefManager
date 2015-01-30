@@ -19,26 +19,105 @@
             <div class="ui right attached rail shoppingcart">
                 <div class="ui tertiary teal segment" style="padding-left:0; padding-right: 0; min-width:26em;">
                     <div class="ui grid" style="padding-bottom:0;padding-left:1rem;padding-right:1rem;">
-                            <div class="left floated left aligned eleven wide column">
+                        <div class="left floated left aligned eleven wide column">
                             <h2 class="ui header shoppingcartheader" style="margin-top:0.3em;"><i class="shop icon"></i>Shopping Cart</h2>
                             <div class="ui loading right labeled huge positive icon button checkoutbutton"><i class="right arrow icon"></i>Checkout</div>
-                            </div>
+                        </div>
 
-                            <div class="right floated center aligned five wide column">
-                                <div class="ui tiny statistic">
-                                    <div class="label">
-                                        Total
-                                    </div>
-                                    <div class="value" style="font-size:1.5rem;">
-                                        <i class="dollar icon" style="margin-right:0.25rem;"></i>0.00
-                                    </div>
+                        <div class="right floated center aligned five wide column">
+                            <div class="ui tiny statistic">
+                                <div class="label">
+                                    Total
+                                </div>
+                                <div class="value" style="font-size:1.5rem;">
+                                    <i class="dollar icon" style="margin-right:0.25rem;"></i>0.00
                                 </div>
                             </div>
                         </div>
+                    </div>
                     <div class="ui basic segment"><div class="ui cards"><div class="hidden start of shopping cart" style="display:none"></div></div></div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="ui modal checkout">
+        <div class="header"><i class="circular shop icon"></i>Cienega Orchards Checkout</div>
+        <form class="ui form stripecheckout">
+            <div class="ui error message"></div>
+            <div class="content">
+                <div class="description">
+                    <div class="ui attached segment">
+                        <h4 class="ui dividing header">Customer info</h4>
+                        <div class="field">
+                            <div class="two fields">
+                                <div class="required field">
+                                    <label>Name</label>
+                                    <div class="ui icon input">
+                                        <i class="user icon"></i>
+                                        <input id="name" type="text" data-stripe="name" />
+                                    </div>
+                                </div>
+                                <div class="required field">
+                                    <label>Email</label>
+                                    <div class="ui icon input">
+                                        <i class="mail icon"></i>
+                                        <input id="customeremail" type="text"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="ui dividing header">Payment details</h4>
+                        <div class="field">
+                            <div class="three fields">
+                                <div class="required eight wide field">
+                                    <label>Card number</label>
+                                    <input id="number" placeholder="XXXX XXXX XXXX XXXX" type="text" size="20" data-stripe="number"/>
+                                </div>
+                                <div class="required two wide field">
+                                    <label>CVC</label>
+                                    <input id="cvc" placeholder="XXX" type="text" size="4" data-stripe="cvc"/>
+                                </div>
+                                <div class="six wide field">
+                                    <label>Expiration Date</label>
+                                    <div class="two fields">
+                                        <div class="required seven wide field">
+                                            <div class="ui icon input">
+                                                <i class="calendar icon"></i>
+                                                <input id="exp_month" placeholder="MM" type="text" size="2" data-stripe="exp_month"/>
+                                            </div>
+                                        </div>
+                                        <div class="required nine wide field">
+                                            <div class="ui icon input">
+                                                <i class="calendar icon"></i>
+                                                <input id="exp_year" placeholder="YYYY" type="text" size="4" data-stripe="exp_year"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui attached segment">
+                        <h3 class="ui header">
+                            Click "Pay" below to order<div class="ui green label itemcount"></div> and charge your card<div class="ui green label amount"></div>
+                        </h3>
+                        <p>Once the order is placed, you should receive a receipt by email, and we will contact you to arrange pickup of your order once all the items are relocated to Atherton.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="actions">
+                <div class="ui buttons">
+                    <div class="ui negative circular button">
+                        Cancel
+                    </div>
+                    <div class="or"></div>
+                    <div class="ui positive circular button">
+                        Pay
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div class="ui small basic modal qrcode">
@@ -54,14 +133,122 @@
         </div>
     </div>
 
+
     <% include include/jquery-scripts.ejs %>
     <% include include/parse-scripts.ejs %>
     <% include include/semantic-scripts.ejs %>
     <% include include/qrcode-scripts.ejs %>
     <% include include/moment-scripts.ejs %>
     <% include include/message-modal.ejs %>
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 
     <script type="text/javascript">
+
+    Parse.Config.get()
+    .then(function(config)
+    {
+        var productionMode = config.get('PRODUCTION_MODE');
+        if(!productionMode) return Parse.Promise.error('No production mode config key found');
+
+        var stripeKey = config.get(productionMode+'stripeKey');
+        if(!stripeKey) return Parse.Promise.error('Could not get stripe key');
+
+        return Parse.Promise.as(stripeKey);
+    })
+    .then(function(stripeKey)
+    {
+        Stripe.setPublishableKey(stripeKey);
+
+        $('.checkoutbutton').removeClass('loading').click(function(ev)
+        {
+            var totalAmount = cartValueCents();
+            var numMeats = $('.shoppingcart .card.meat').length;
+
+            $('.modal.checkout .label.itemcount').empty().appendText(numMeats+' item'+(numMeats>1?'s':''));
+            $('.modal.checkout .label.amount').empty().append(
+                $('<i>',{class:'dollar icon'})
+            ).appendText((totalAmount/100.00).toFixed(2));
+            $('.modal.checkout').modal('show');
+
+            ev.preventDefault();
+        });
+
+        return Parse.Promise.as('ok');
+    })
+    .fail(function(err)
+    {
+        displayError(err);
+    });
+
+    function cartValueCents()
+    {
+        var totalAmount = 0;
+        $('.shoppingcart .card.meat').each(
+            function()
+            {
+                var parseMeat = $(this).data('meat');
+                if(parseMeat)
+                {
+                    var meatPrice = Math.floor(parseMeat.get('units') * parseMeat.get('cut').get('price') * 100);
+                    totalAmount += meatPrice;
+                }
+            }
+        );
+
+        return totalAmount;
+    }
+
+    function stripeCheckout(status, response)
+    {
+        console.log("Stripe callback");
+        console.log(status);
+        console.log(response);
+
+        var form = $('.form.stripecheckout');
+
+        if(response.error)
+        {
+            form.form('add prompt', response.error.param, response.error.message);
+            form.find('#'+response.error.param).focus();
+
+            // Re-enable buttons that were disabled on submit
+            form.find('.button').removeClass('disabled loading');
+        }
+        else
+        {
+            var stripeToken = response.id;
+
+            Parse.Cloud.run('chargeCard',
+                            {
+                                items: $('.shoppingcart .meat.card').map(function(){return $(this).data('meat').id;}),
+                                stripeToken: stripeToken,
+                                amountCents: cartValueCents(),
+                                description: 'Cienega Orchards: '+$('.shoppingcart .card.meat').length+' items'
+                            })
+            .then(function(result)
+            {
+                console.log('Checkout OK');
+                console.log(result);
+                // Should create order, clear cart, dismiss modal
+                form.trigger('reset');
+                $('.modal.checkout').modal('hide');
+                return Parse.Promise.as('ok');
+            })
+            .fail(function(err)
+            {
+                console.log('Checkout error');
+                console.log(err);
+                form.find('.error.message').text('Checkout failed: '+err.message).finish().slideDown();
+
+                return Parse.Promise.as('handled');
+            })
+            .always(function()
+            {
+                // Turn buttons back on
+                form.find('.button').removeClass('disabled loading');
+            })
+        }
+    }
 
     function getClosestValue(arr, val)
     {
@@ -106,7 +293,7 @@
             );
 
             // Find where to insert it
-            var insertAfterThisLocation = getClosestValue($('.main.content .speciesholder'), speciesStr);;
+            var insertAfterThisLocation = getClosestValue($('.main.content .speciesholder'), speciesStr);
             if(insertAfterThisLocation.length == 0)
             {
                 insertAfterThisLocation = $('.main.content>.shoppingcart');
@@ -372,18 +559,7 @@
             $('.shoppingcart .statistic').finish().slideUp(
                 function()
                 {
-                    var totalAmount = 0;
-                    $('.shoppingcart .card.meat').each(
-                        function()
-                        {
-                            var parseMeat = $(this).data('meat');
-                            if(parseMeat)
-                            {
-                                var meatPrice = Math.floor(parseMeat.get('units') * parseMeat.get('cut').get('price') * 100);
-                                totalAmount += meatPrice;
-                            }
-                        }
-                    );
+                    var totalAmount = cartValueCents();
 
                     $(this).find('.value').data('total',totalAmount).contents().last().replaceWith((totalAmount/100.0).toFixed(2));
                 }).slideDown();
@@ -417,6 +593,93 @@
         wf.async = 'true';
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(wf, s);
+
+        $('.form.stripecheckout').form({
+            name: {
+                identifier: 'name',
+                rules: [ { type: 'empty', prompt: 'Please enter your name' } ]
+            },
+            customeremail: {
+                identifier: 'customeremail',
+                rules: [ { type: 'empty', prompt: 'Please enter your email address' },
+                         { type: 'email', prompt: 'Please enter a valid email address' } ]
+            },
+            number: {
+                identifier: 'number',
+                rules: [ { type: 'empty', prompt: 'Please specify credit card number' },
+                         { type: 'cardnumbervalid', prompt: 'Invalid card number' } ]
+            },
+            cvc: {
+                identifier: 'cvc',
+                rules: [ { type: 'empty', prompt: 'Please specify CVC security code from back of card' },
+                         { type: 'cvcvalid', prompt: 'Invalid CVC number' },
+                       ]
+            },
+            exp_month: {
+                identifier: 'exp_month',
+                rules: [ { type: 'empty', prompt: 'Please enter expiration month (MM)' },
+                         { type: 'integer', prompt: 'Must be an integer' },
+                         { type: 'maxLength[2]', prompt: 'Max 2 digits'} ]
+            },
+            exp_year: {
+                identifier: 'exp_year',
+                rules: [ { type: 'empty', prompt: 'Please enter expiration year (YYYY)' },
+                         { type: 'integer', prompt: 'Must be an integer' },
+                         { type: 'length[2]', prompt: 'At least 2 digits'},
+                         { type: 'maxLength[4]', prompt: 'Max 4 digits'} ]
+            }
+        }, {
+            inline: true,
+            rules: {
+                cardnumbervalid: function ()
+                {
+                    return Stripe.card.validateCardNumber($(this).val());
+                },
+                cvcvalid: function()
+                {
+                    return Stripe.card.validateCVC($(this).val());
+                }
+            }
+        })
+        .submit(function(evt)
+        {
+            var form = $(this);
+            form.find('.error.message').finish().slideUp();
+
+            form.form('validate form');
+
+            event.preventDefault();
+            if(form.hasClass('success'))
+            {
+                // Validation OK so talk to Stripe to checkout
+
+                // Disable the form buttons to prevent repeated clicks
+                form.find('.button').addClass('disabled loading');
+
+                Stripe.card.createToken(form, stripeCheckout);
+            }
+            else
+            {
+                // Validation booboo, so do nothing and let the user fix things
+                console.log("Do not proceed")
+            }
+            // In any case, do not POST
+            return false;
+        });
+
+        $('.modal.checkout').modal({
+            closable: false,
+            onDeny: function()
+            {
+                $('form').trigger('reset');
+            },
+            onApprove: function()
+            {
+                // Do not close this thing here; only from form submit
+                $('form').trigger('submit');
+                return false;
+            }
+        });
 
         var meatQuery = new Parse.Query('Meat')
             .exists('freezer')          // If "eaten" we clear freezer
