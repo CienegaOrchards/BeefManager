@@ -42,7 +42,7 @@
     </div>
 
     <div class="ui modal checkout">
-        <div class="header"><i class="circular shop icon"></i>Cienega Orchards Checkout</div>
+        <div class="header"><i class="circular shop icon"></i><span id="ordernumber">Cienega Orchards Checkout</span></div>
         <form class="ui form stripecheckout">
             <div class="ui error message"></div>
             <div class="content">
@@ -144,41 +144,10 @@
 
     <script type="text/javascript">
 
-    Parse.Config.get()
-    .then(function(config)
+    function cartContents()
     {
-        var productionMode = config.get('PRODUCTION_MODE');
-        if(!productionMode) return Parse.Promise.error('No production mode config key found');
-
-        var stripeKey = config.get(productionMode+'stripeKey');
-        if(!stripeKey) return Parse.Promise.error('Could not get stripe key');
-
-        return Parse.Promise.as(stripeKey);
-    })
-    .then(function(stripeKey)
-    {
-        Stripe.setPublishableKey(stripeKey);
-
-        $('.checkoutbutton').removeClass('loading').click(function(ev)
-        {
-            var totalAmount = cartValueCents();
-            var numMeats = $('.shoppingcart .card.meat').length;
-
-            $('.modal.checkout .label.itemcount').empty().appendText(numMeats+' item'+(numMeats>1?'s':''));
-            $('.modal.checkout .label.amount').empty().append(
-                $('<i>',{class:'dollar icon'})
-            ).appendText((totalAmount/100.00).toFixed(2));
-            $('.modal.checkout').modal('show');
-
-            ev.preventDefault();
-        });
-
-        return Parse.Promise.as('ok');
-    })
-    .fail(function(err)
-    {
-        displayError(err);
-    });
+        return $.makeArray($('.shoppingcart .card.meat').map(function(){ return $(this).data('meat').id; }));
+    }
 
     function cartValueCents()
     {
@@ -197,6 +166,69 @@
 
         return totalAmount;
     }
+
+    Parse.Config.get()
+    .then(function(config)
+    {
+        var productionMode = config.get('PRODUCTION_MODE');
+        if(!productionMode) return Parse.Promise.error('No production mode config key found');
+
+        var stripeKey = config.get(productionMode+'stripeKey');
+        if(!stripeKey) return Parse.Promise.error('Could not get stripe key');
+
+        return Parse.Promise.as(stripeKey);
+    })
+    .then(function(stripeKey)
+    {
+        Stripe.setPublishableKey(stripeKey);
+
+        $('.checkoutbutton').removeClass('loading').click(function(ev)
+        {
+            $(this).addClass('disabled loading'); // Prevent double clicks
+            ev.preventDefault();
+
+            // Try and reserve cart contents
+            Parse.Cloud.run('reserveItems',{
+                itemList: cartContents()
+            })
+            .then(function()
+            {
+                // Everything reserved OK, so create the order
+                return Parse.Cloud.run('createOrder',
+                {
+                    itemList: cartContents()
+                });
+            })
+            .then(function(response)
+            {
+                var orderID = response.orderID;
+                var totalAmount = response.amountCents;
+                var numMeats = response.itemCount;
+
+                $('.modal.checkout #ordernumber').empty().text('Cienega Orchards Order # '+orderID);
+                $('.form.stripecheckout').data('orderID', orderID); // Save for charging
+                $('.modal.checkout .label.itemcount').empty().appendText(numMeats+' item'+(numMeats>1?'s':''));
+                $('.modal.checkout .label.amount').empty().append(
+                    $('<i>',{class:'dollar icon'})
+                ).appendText((totalAmount/100.00).toFixed(2));
+                $('.modal.checkout').modal('show');
+            })
+            .fail(function(error)
+            {
+                console.log(error);
+                // Failed to reserve error.failedMeat so remove it from cart & inventory and display error
+                displayError('Item '+error.message+' got janked from under you!');
+            });
+
+            $(this).removeClass('disabled loading'); // Re-enable button
+        });
+
+        return Parse.Promise.as('ok');
+    })
+    .fail(function(err)
+    {
+        displayError(err);
+    });
 
     function stripeCheckout(status, response)
     {
@@ -220,10 +252,8 @@
 
             Parse.Cloud.run('chargeCard',
                             {
-                                items: $('.shoppingcart .meat.card').map(function(){return $(this).data('meat').id;}),
+                                orderID: form.data('orderID'),
                                 stripeToken: stripeToken,
-                                amountCents: cartValueCents(),
-                                description: 'Cienega Orchards: '+$('.shoppingcart .card.meat').length+' items'
                             })
             .then(function(result)
             {
@@ -684,8 +714,7 @@
         var meatQuery = new Parse.Query('Meat')
             .exists('freezer')          // If "eaten" we clear freezer
             .notEqualTo('freezer',null) // Sometimes "exists" excludes null, sometimes it doesn't, it seems...
-            .equalTo('lock', 0)         // Object locked by someone checking out
-            .doesNotExist('orderItem')  // Object part of an order
+            .equalTo('lock', 0)         // Object locked by someone checking out or ordered
             .include('cut')
             .include('freezer')
             .include('animal')

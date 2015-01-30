@@ -3,8 +3,7 @@ var Stripe = require('stripe');
 
 // Params:
 // stripeToken - string token to charge against
-// amountCents - number amount in cents
-// description - string description
+// orderID     - order to charge for
 Parse.Cloud.define("chargeCard",
 function(req, res)
 {
@@ -12,21 +11,20 @@ function(req, res)
     Parse.Cloud.useMasterKey();
 
     var stripeToken;
-    var amountCents;
-    var description;
+    var orderID;
+    var theOrder;
 
     Parse.Promise.as(req.params)
     .then(function(params)
     {
-        if(!params.stripeToken || !params.amountCents || !params.description)
+        if(!params.stripeToken || !params.orderID)
         {
             return Parse.Promise.error('Missing parameter');
         }
         else
         {
             stripeToken = params.stripeToken;
-            amountCents = params.amountCents;
-            description = params.description;
+            orderID = params.orderID;
 
             return Parse.Config.get();
         }
@@ -41,29 +39,44 @@ function(req, res)
     {
         if(!secretKey) return Parse.Promise.error('Could not get Stripe authentication key');
 
-        var secret = secretKey.get('value');
+        Stripe.initialize(secretKey.get('value'));
 
-        Stripe.initialize(secret);
+        return (new Parse.Query('Order'))
+        .equalTo('objectId', orderID)
+        .first();
+    })
+    .then(function(order)
+    {
+        if(!order) return Parse.Promise.error('Could not find order');
 
-        console.log('Charge card: '+stripeToken+' for $'+(amountCents/100.0).toFixed(2));
+        theOrder = order;
+        var amountCents = Math.floor((order.get('totalPrice')-order.get('paid'))*100);
+        var description = 'Order # '+order.id+' - '+order.get('itemCount')+' item'+(order.get('itemCount')>1?'s':'');
 
         return Stripe.Charges.create({
-                card: stripeToken,
+            card: stripeToken,
             amount: amountCents,
             description: description,
             currency: 'usd',
             statement_descriptor: 'CIENEGA ORCHARDS MEAT'
+        })
+        .then(null,function(error)
+        {
+            console.log('Charging with stripe failed. Error: ' + error);
+            return Parse.Promise.error(error.message);
         });
     })
     .then(function(result)
     {
+        return theOrder.increment('paid',result.amount/100.0).save();
+    })
+    .then(function(result)
+    {
         res.success(result);
-        return Parse.Promise.as('ok');
     })
     .fail(function(error)
     {
-        res.error(error.message);
-        return Parse.Promise.as('handled');
+        res.error(error);
     });
 });
 

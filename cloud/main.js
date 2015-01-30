@@ -2,6 +2,7 @@
 var app = require('cloud/app.js');
 
 require('cloud/roles.js')(app);
+require('cloud/checkout.js')(app);
 require('cloud/stripeFunctions.js')(app);
 
 app.get('/'         , function(req, res) { res.render('index'); });
