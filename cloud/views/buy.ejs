@@ -477,6 +477,11 @@
                 $('<div>',{class:'ui right floated teal mini button buybutton'}).append($('<i>',{class:'small mail forward icon'}), 'BUY')
             )
         );
+        if(freezerStr == 'Newly Added')
+        {
+            newMeat.css('background-color','rgb(210, 255, 255)');
+            newMeat.addClass('notlocal');
+        }
         newMeat.data({ meat: meat });
         newMeat.hover(
         function() // in
