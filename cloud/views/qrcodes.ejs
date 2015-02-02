@@ -67,8 +67,8 @@
         {
             (new Parse.Query('Meat'))
             .equalTo('freezer', newMeatFreezer)
-            .addAscending('units')
             .include('cut')
+            .addAscending('units')
             .limit(1000)
             .find(function(meats)
             {
@@ -90,10 +90,10 @@
                                 maxVersion: 13,
                                 quiet: 4,
                                 mode: 2,
-                                mSize: 0.12,
+                                mSize: 0.09,
                                 mPosY: 0.78,
                                 fontname: 'Amatic SC',
-                                fontcolor: '#c00',
+                                fontcolor: '#000',
 
                                 label: meat.get('units')+cut.get('units')+' '+cut.get('species')+' '+cut.get('cut')
                         })
